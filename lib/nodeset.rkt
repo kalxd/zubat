@@ -3,6 +3,7 @@
 (provide html/find-by-id)
 
 (require racket/contract
+         racket/list
 
          sxml
 
@@ -24,9 +25,9 @@
                          (p "text"))))
   )
 
-;; 子元素
+;; 子元素列表
 (define/contract html/children
-  (-> sxml:element? nodeset?)
+  (-> (or/c empty? sxml:element?) nodeset?)
   (sxml:child sxml:element?))
 
 (module+ test
@@ -42,6 +43,19 @@
 (define/contract (id-equal? id el)
   (-> string? sxml:element? boolean?)
   (equal? id (html/attr 'id el)))
+
+;; 第一个子元素
+(define/contract html/child
+  (-> (or/c empty? sxml:element?) (maybe/c sxml:element?))
+  (compose safe-head html/children))
+
+(module+ test
+  (test-case "html/child"
+    (check-equal? "nav bar" (html/attr 'class (html/child el)))
+    (let ([empty-el '()]
+          [el1 '(div (p))])
+      (check-equal? #f (html/child empty-el))
+      (check-equal? 'p (sxml:element-name (html/child el1))))))
 
 ;; 按id查询
 (define/contract (html/find-by-id id el)
