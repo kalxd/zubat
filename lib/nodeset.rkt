@@ -24,6 +24,21 @@
                          (p "text"))))
   )
 
+;; 子元素
+(define/contract html/children
+  (-> sxml:element? nodeset?)
+  (sxml:child sxml:element?))
+
+(module+ test
+  (test-case "html/children"
+    (check-equal? 2
+                  (length (html/children el)))
+    (let ([el1 '(div (p) (p) (p))]
+          [el2 '(div)])
+      (check-equal? 3 (length (html/children el1)) "三个元素")
+      (check-equal? 0 (length (html/children el2)) "单个元素")))
+    )
+
 (define/contract (id-equal? id el)
   (-> string? sxml:element? boolean?)
   (equal? id (html/attr 'id el)))
@@ -34,8 +49,3 @@
   (define find-by-id
     (select-first-kid (λ (el) (displayln (sxml:element? el)) (id-equal? id el))))
   (find-by-id el))
-
-(module+ test
-  (test-case "html/find-by-id"
-    (check-equal? el (html/find-by-id "main" el)))
-  )
