@@ -44,8 +44,8 @@
                   (length (zubat:children el)))
     (let ([el1 '(div (p) (p) (p))]
           [el2 '(div)])
-      (check-equal? 3 (length (zubat:children el1)) "三个元素")
-      (check-equal? 0 (length (zubat:children el2)) "单个元素"))))
+      (check-length 3 (zubat:children el1) "三个元素")
+      (check-length 0 (zubat:children el2) "单个元素"))))
 
 ;; 第一个子元素
 (define/contract zubat:child
