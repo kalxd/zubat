@@ -1,6 +1,8 @@
 #lang racket/base
 
-(provide html/find-by-id)
+(provide zubat:children
+         zubat:child
+         zubat:select)
 
 (require racket/contract
          racket/list
@@ -12,6 +14,12 @@
 
 (module+ test
   (require rackunit)
+
+  (define-simple-check (check-empty? v)
+    (empty? v))
+
+  (define-simple-check (check-length n xs)
+    (equal? n (length xs)))
 
   (define el '(main (@ (id "main"))
                     "hehe"
@@ -26,40 +34,42 @@
   )
 
 ;; 子元素列表
-(define/contract html/children
+(define/contract zubat:children
   (-> (or/c empty? sxml:element?) nodeset?)
   (sxml:child sxml:element?))
 
 (module+ test
-  (test-case "html/children"
+  (test-case "zubat:children"
     (check-equal? 2
-                  (length (html/children el)))
+                  (length (zubat:children el)))
     (let ([el1 '(div (p) (p) (p))]
           [el2 '(div)])
-      (check-equal? 3 (length (html/children el1)) "三个元素")
-      (check-equal? 0 (length (html/children el2)) "单个元素")))
-    )
-
-(define/contract (id-equal? id el)
-  (-> string? sxml:element? boolean?)
-  (equal? id (html/attr 'id el)))
+      (check-equal? 3 (length (zubat:children el1)) "三个元素")
+      (check-equal? 0 (length (zubat:children el2)) "单个元素"))))
 
 ;; 第一个子元素
-(define/contract html/child
+(define/contract zubat:child
   (-> (or/c empty? sxml:element?) (maybe/c sxml:element?))
-  (compose safe-head html/children))
+  (compose safe-head zubat:children))
 
 (module+ test
-  (test-case "html/child"
-    (check-equal? "nav bar" (html/attr 'class (html/child el)))
+  (test-case "zubat:child"
+    (check-equal? "nav bar" (zubat:attr 'class (zubat:child el)))
     (let ([empty-el '()]
           [el1 '(div (p))])
-      (check-equal? #f (html/child empty-el))
-      (check-equal? 'p (sxml:element-name (html/child el1))))))
+      (check-equal? #f (zubat:child empty-el))
+      (check-equal? 'p (sxml:element-name (zubat:child el1))))))
 
-;; 按id查询
-(define/contract (html/find-by-id id el)
-  (-> string? sxml:element? (maybe/c sxml:element?))
-  (define find-by-id
-    (select-first-kid (λ (el) (displayln (sxml:element? el)) (id-equal? id el))))
-  (find-by-id el))
+;; 过滤元素
+(define/contract (zubat:select f el)
+  (-> (-> sxml:element? boolean?)
+      sxml:element?
+      (listof sxml:element?))
+  (filter f (zubat:children el)))
+
+(module+ test
+  (define (select-class2 el)
+    (= 2 (length (zubat:class el))))
+
+  (test-case "zubat:select"
+    (check-length 2 (zubat:select select-class2 el))))

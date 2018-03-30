@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide all-defined-out)
+(provide (all-defined-out))
 
 (require racket/contract
          racket/list)

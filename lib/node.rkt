@@ -6,7 +6,8 @@
          zubat:attr
          zubat:text
          zubat:tag
-         zubat:id)
+         zubat:id
+         zubat:class)
 
 (require racket/file
          racket/contract
