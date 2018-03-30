@@ -3,7 +3,9 @@
 (provide file->sxml
          html->xexp
 
-         html/attr)
+         zubat:attr
+         zubat:text
+         zubat:tag)
 
 (require racket/file
          racket/contract
@@ -18,52 +20,43 @@
   (require rackunit
            racket/string)
 
-  (define el '(main (@ (id "main-id")
-                       (class "container"))
-                    "main text"
-                    (nav (a (@ (href "link1")) "item 1")
-                         (a (@ (href "link2")) "item 2"))))
-
+  (define el '(main (@ (id "main-id")) "main text"))
   (define el1 '(div (@ (class "button")) "primary button"))
-  (define el2 '(input (@ (class "input") (type "text"))))
-  )
+  (define el2 '(input (@ (class "input") (type "text")))))
 
 (define file->sxml
   (compose html->xexp
            (λ (path) (file->string path #:mode 'text))))
 
 ;; 元素属性
-(define/contract (html/attr attr el)
+(define/contract (zubat:attr attr el)
   (-> symbol? sxml:element? (maybe/c string?))
   (sxml:attr el attr))
 
 (module+ test
-  (test-case "html/attr"
-    (check-equal? "main-id" (html/attr 'id el))
-    (check-equal? "button" (html/attr 'class el1))
-    (check-equal? "text" (html/attr 'type el2)))
-  )
+  (test-case "zubat:attr"
+    (check-equal? "main-id" (zubat:attr 'id el))
+    (check-equal? "button" (zubat:attr 'class el1))
+    (check-equal? "text" (zubat:attr 'type el2))))
 
 ;; 元素文本
-(define/contract html/text
+(define/contract zubat:text
   (-> sxml:element? string?)
   sxml:text)
 
 (module+ test
-  (test-case "html/text"
-    (check-equal? "main text" (html/text el))
-    (check-equal? "primary button" (html/text el1))
-    (check-true (not (non-empty-string? (html/text el2)))))
-  )
+  (test-case "zubat:text"
+    (check-equal? "main text" (zubat:text el))
+    (check-equal? "primary button" (zubat:text el1))
+    (check-true (not (non-empty-string? (zubat:text el2))))))
 
 ;; 元素名称
-(define/contract html/tag-name
+(define/contract zubat:tag
   (-> sxml:element? string?)
   sxml:ncname)
 
 (module+ test
-  (test-case "html/tag-name"
-    (check-equal? "main" (html/tag-name el))
-    (check-equal? "div" (html/tag-name el1))
-    (check-equal? "input" (html/tag-name el2)))
-  )
+  (test-case "zubat:tag"
+    (check-equal? "main" (zubat:tag el))
+    (check-equal? "div" (zubat:tag el1))
+    (check-equal? "input" (zubat:tag el2))))
