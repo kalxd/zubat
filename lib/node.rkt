@@ -5,11 +5,13 @@
 
          zubat:attr
          zubat:text
-         zubat:tag)
+         zubat:tag
+         zubat:id)
 
 (require racket/file
          racket/contract
          racket/list
+         racket/string
          html-parsing
          sxml
 
@@ -19,6 +21,9 @@
 (module+ test
   (require rackunit
            racket/string)
+
+  (define-simple-check (check-empty? v)
+    (empty? v))
 
   (define el '(main (@ (id "main-id")) "main text"))
   (define el1 '(div (@ (class "button")) "primary button"))
@@ -60,3 +65,26 @@
     (check-equal? "main" (zubat:tag el))
     (check-equal? "div" (zubat:tag el1))
     (check-equal? "input" (zubat:tag el2))))
+
+;; 元素id
+(define/contract (zubat:id el)
+  (-> sxml:element? (maybe/c string?))
+  (zubat:attr 'id el))
+
+(module+ test
+  (test-case "zubat:id"
+    (check-equal? "main-id" (zubat:id el))
+    (check-equal? #f (zubat:id el1))
+    (check-equal? #f (zubat:id el2))))
+
+;; 元素class
+(define/contract zubat:class
+  (-> sxml:element? (listof string?))
+  (compose (λ (s) (if s (string-split s) empty))
+           (λ (el) (zubat:attr 'class el))))
+
+(module+ test
+  (test-case "zubat:class"
+    (check-empty? (zubat:class el))
+    (check-equal? '("button") (zubat:class el1))
+    (check-equal? '("input") (zubat:class el2))))

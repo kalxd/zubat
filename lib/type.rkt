@@ -1,7 +1,6 @@
 #lang racket/base
 
-(provide maybe/c
-         safe-head)
+(provide all-defined-out)
 
 (require racket/contract
          racket/list)
