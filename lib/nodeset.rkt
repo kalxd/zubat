@@ -1,8 +1,6 @@
 #lang racket/base
 
-(provide zubat:children
-         zubat:child
-         zubat:select)
+(provide (all-defined-out))
 
 (require racket/contract
          racket/list
@@ -13,13 +11,7 @@
          "node.rkt")
 
 (module+ test
-  (require rackunit)
-
-  (define-simple-check (check-empty? v)
-    (empty? v))
-
-  (define-simple-check (check-length n xs)
-    (equal? n (length xs)))
+  (require "test-kit.rkt")
 
   (define el '(main (@ (id "main"))
                     "hehe"

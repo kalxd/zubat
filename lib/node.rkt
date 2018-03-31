@@ -1,13 +1,6 @@
 #lang racket/base
 
-(provide file->sxml
-         html->xexp
-
-         zubat:attr
-         zubat:text
-         zubat:tag
-         zubat:id
-         zubat:class)
+(provide (all-defined-out))
 
 (require racket/file
          racket/contract
@@ -20,11 +13,8 @@
 
 ;;; 测试基本数据
 (module+ test
-  (require rackunit
+  (require "test-kit.rkt"
            racket/string)
-
-  (define-simple-check (check-empty? v)
-    (empty? v))
 
   (define el '(main (@ (id "main-id")) "main text"))
   (define el1 '(div (@ (class "button")) "primary button"))
