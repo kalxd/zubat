@@ -1,10 +1,12 @@
 #lang racket/base
 
 (provide (all-defined-out)
-         (all-from-out rackunit))
+         (all-from-out rackunit)
+         (all-from-out racket/trace))
 
 (require rackunit
-         racket/list)
+         racket/list
+         racket/trace)
 
 (define-simple-check (check-empty? v)
   (empty? v))

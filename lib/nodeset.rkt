@@ -67,6 +67,25 @@
       (check-equal? #f (zubat:child empty-el))
       (check-equal? 'p (sxml:element-name (zubat:child el1))))))
 
+;; 所有子元素
+(define/contract (zubat:all el)
+  (-> sxml:element? nodeset?)
+  (foldl (λ (el xs)
+           (define children (zubat:all el))
+           (append xs (cons el children)))
+         empty
+         (zubat:children el)))
+
+(module+ test
+  (test-case "zubat:all"
+    (check-length 5 (zubat:all el))
+    (let ([el1 '(div (p) (p))]
+          [el2 '(div)]
+          [el3 '(div (div (div) (div)) (div))])
+      (check-length 2 (zubat:all el1))
+      (check-length 0 (zubat:all el2))
+      (check-length 4 (zubat:all el3)))))
+
 ;; 过滤元素
 (define/contract (zubat:select f el)
   (-> (-> sxml:element? boolean?)
