@@ -39,6 +39,21 @@
       (check-length 3 (zubat:children el1) "三个元素")
       (check-length 0 (zubat:children el2) "单个元素"))))
 
+;; 是否有子元素
+(define/contract zubat:child?
+  (-> sxml:element? boolean?)
+  (compose not
+           empty?
+           zubat:children))
+
+(module+ test
+  (test-case "zubat:child?"
+    (check-true (zubat:child? el))
+    (let ([el1 '(main)]
+          [el2 '(a (@ (href "link")))])
+      (check-false (zubat:child? el1))
+      (check-false (zubat:child? el2)))))
+
 ;; 第一个子元素
 (define/contract zubat:child
   (-> (or/c empty? sxml:element?) (maybe/c sxml:element?))
@@ -65,3 +80,15 @@
 
   (test-case "zubat:select"
     (check-length 2 (zubat:select select-class2 el))))
+
+;; 过滤到第一个元素
+(define/contract (zubat:select-first f el)
+  (-> (-> sxml:element? boolean?)
+      sxml:element?
+      (maybe/c sxml:element?))
+  (safe-head (zubat:select f el)))
+
+(module+ test
+  (test-case "zubat:select-first"
+    (check-equal? "nav"
+                  (zubat:tag (zubat:select-first select-class2 el)))))
