@@ -75,3 +75,16 @@
     (check-empty? (zubat:class el))
     (check-equal? '("button") (zubat:class el1))
     (check-equal? '("input") (zubat:class el2))))
+
+;; 元素是否有class
+(define/contract (zubat:class? name el)
+  (-> string? sxml:element? boolean?)
+  (define class-list (zubat:class el))
+  (and (index-of class-list name) #t))
+
+(module+ test
+  (test-case "zubat:class?"
+    (check-false (zubat:class? "main" el))
+    (check-false (zubat:class? "div" el1))
+    (check-true (zubat:class? "button" el1))
+    (check-true (zubat:class? "input" el2))))
