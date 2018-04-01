@@ -20,10 +20,6 @@
   (define el1 '(div (@ (class "button")) "primary button"))
   (define el2 '(input (@ (class "input") (type "text")))))
 
-(define file->sxml
-  (compose html->xexp
-           (λ (path) (file->string path #:mode 'text))))
-
 ;; 元素属性
 (define/contract (zubat:attr attr el)
   (-> symbol? sxml:element? (maybe/c string?))
