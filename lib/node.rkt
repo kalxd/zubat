@@ -31,6 +31,20 @@
     (check-equal? "button" (zubat:attr 'class el1))
     (check-equal? "text" (zubat:attr 'type el2))))
 
+;; 元素属性是否存在
+(define/contract (zubat:attr? attr value el)
+  (-> symbol? string? sxml:element? boolean?)
+  (define el-attr (zubat:attr attr el))
+  (equal? value el-attr))
+
+(module+ test
+  (test-case "zubat:attr?"
+    (check-true (zubat:attr? 'id "main-id" el))
+    (check-false (zubat:attr? 'id "id" el))
+    (check-true (zubat:attr? 'class "button" el1))
+    (check-true (zubat:attr? 'class "input" el2))
+    (check-false (zubat:attr? 'value "input" el2))))
+
 ;; 元素文本
 (define/contract zubat:text
   (-> sxml:element? string?)
