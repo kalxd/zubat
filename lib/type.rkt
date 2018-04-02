@@ -12,10 +12,18 @@
   (-> (listof any/c) (maybe/c any/c))
   (if (empty? xs) #f (first xs)))
 
-
 (module+ test
   (require rackunit)
   (test-case "save-head"
     (check-equal? #f (safe-head '()))
     (check-equal? 1 (safe-head '(1 2)))
     (check-equal? 1 (safe-head (range 1 10)))))
+
+(define/contract (safe-tail xs)
+  (-> (listof any/c) (maybe/c any/c))
+  (if (empty? xs) #f (last xs)))
+
+(module+ test
+  (test-case "save-tail"
+    (check-equal? 2 (safe-tail '(1 2)))
+    (check-false (safe-tail '()))))
