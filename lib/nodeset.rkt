@@ -122,3 +122,17 @@
                                       el)])
       (check-equal? "href1" (zubat:attr 'href nav-el))
       (check-equal? "item 1" (zubat:text nav-el)))))
+
+;; getElementById
+(define/contract (zubat:id id el)
+  (-> string? sxml:element? (maybe/c sxml:element?))
+  (define (select-id el)
+    (equal? (zubat:attr 'id el)
+            id))
+  (zubat:select-first select-id el))
+
+(module+ test
+  (let ([body-el (zubat:id "body" el)]
+        [nil-el (zubat:id "you-do-not-know-me" el)])
+    (check-equal? "div" (zubat:tag body-el))
+    (check-false nil-el)))
