@@ -18,12 +18,11 @@
 
                     (nav (@ (class "nav bar"))
 
-                         (a (@ (class "item") "item 1"))
-                         (a (@ (class "item") "item 2")))
+                         (a (@ (class "item") (href "href1")) "item 1")
+                         (a (@ (class "item") (href "href2")) "item 2"))
                     (div (@ (class "main body") (id "body"))
 
-                         (p "text"))))
-  )
+                         (p "text")))))
 
 ;; 子元素列表
 (define/contract zubat:children
@@ -91,14 +90,20 @@
   (-> (-> sxml:element? boolean?)
       sxml:element?
       (listof sxml:element?))
-  (filter f (zubat:children el)))
+  (filter f (zubat:all el)))
 
 (module+ test
   (define (select-class2 el)
     (= 2 (length (zubat:class el))))
 
   (test-case "zubat:select"
-    (check-length 2 (zubat:select select-class2 el))))
+    (check-length 2 (zubat:select select-class2 el))
+    (check-length 2 (zubat:select (λ (el)
+                                    (equal? '("item") (zubat:class el)))
+                                  el))
+    (check-length 1 (zubat:select (λ (el)
+                                    (equal? "p" (zubat:tag el)))
+                                  el))))
 
 ;; 过滤到第一个元素
 (define/contract (zubat:select-first f el)
@@ -110,4 +115,10 @@
 (module+ test
   (test-case "zubat:select-first"
     (check-equal? "nav"
-                  (zubat:tag (zubat:select-first select-class2 el)))))
+                  (zubat:tag (zubat:select-first select-class2
+                                                 el)))
+    (let ([nav-el (zubat:select-first (λ (el)
+                                        (equal? "a" (zubat:tag el)))
+                                      el)])
+      (check-equal? "href1" (zubat:attr 'href nav-el))
+      (check-equal? "item 1" (zubat:text nav-el)))))
