@@ -15,13 +15,11 @@
 
   (define el '(main (@ (id "main"))
                     "hehe"
-
                     (nav (@ (class "nav bar"))
-
                          (a (@ (class "item") (href "href1")) "item 1")
-                         (a (@ (class "item") (href "href2")) "item 2"))
+                         (a (@ (class "item") (href "href2")) "item 2")
+                         (a (@ (class "item") (href "href3")) "item 3"))
                     (div (@ (class "main body") (id "body"))
-
                          (p "text")))))
 
 ;; 子元素列表
@@ -77,7 +75,7 @@
 
 (module+ test
   (test-case "zubat:all"
-    (check-length 5 (zubat:all el))
+    (check-length 6 (zubat:all el))
     (let ([el1 '(div (p) (p))]
           [el2 '(div)]
           [el3 '(div (div (div) (div)) (div))])
@@ -98,7 +96,7 @@
 
   (test-case "zubat:select"
     (check-length 2 (zubat:select select-class2 el))
-    (check-length 2 (zubat:select (λ (el)
+    (check-length 3 (zubat:select (λ (el)
                                     (equal? '("item") (zubat:class el)))
                                   el))
     (check-length 1 (zubat:select (λ (el)
@@ -136,3 +134,15 @@
         [nil-el (zubat:id "you-do-not-know-me" el)])
     (check-equal? "div" (zubat:tag body-el))
     (check-false nil-el)))
+
+;; 父一级元素
+(define/contract (zubat:parent root el)
+  (-> sxml:element? sxml:element? (maybe/c sxml:element?))
+  (safe-head ((node-parent root) el)))
+
+(module+ test
+  (test-case "zubat:parent"
+    (let ([div (zubat:id "body" el)]
+          [a (zubat:select-first (λ (el) (equal? "a" (zubat:tag el))) el)])
+      (check-equal? "main" (zubat:tag (zubat:parent el div)))
+      (check-equal? "nav" (zubat:tag (zubat:parent el a))))))
