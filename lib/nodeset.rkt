@@ -148,4 +148,5 @@
     (let ([div (zubat:id "body" el)]
           [a (zubat:select-first (λ (el) (equal? "a" (zubat:tag el))) el)])
       (check-tag? "main" (zubat:parent el div))
-      (check-tag? "nav" (zubat:parent el a)))))
+      (check-tag? "nav" (zubat:parent el a))
+      (check-false (zubat:parent el el)))))
