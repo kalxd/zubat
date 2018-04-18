@@ -13,6 +13,9 @@
 (module+ test
   (require "test-kit.rkt")
 
+  (define-simple-check (check-tag? name el)
+    (equal? name (zubat:tag el)))
+
   (define el '(main (@ (id "main"))
                     "hehe"
                     (nav (@ (class "nav bar"))
@@ -132,7 +135,7 @@
 (module+ test
   (let ([body-el (zubat:id "body" el)]
         [nil-el (zubat:id "you-do-not-know-me" el)])
-    (check-equal? "div" (zubat:tag body-el))
+    (check-tag? "div" body-el)
     (check-false nil-el)))
 
 ;; 父一级元素
@@ -144,5 +147,5 @@
   (test-case "zubat:parent"
     (let ([div (zubat:id "body" el)]
           [a (zubat:select-first (λ (el) (equal? "a" (zubat:tag el))) el)])
-      (check-equal? "main" (zubat:tag (zubat:parent el div)))
-      (check-equal? "nav" (zubat:tag (zubat:parent el a))))))
+      (check-tag? "main" (zubat:parent el div))
+      (check-tag? "nav" (zubat:parent el a)))))
