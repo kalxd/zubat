@@ -4,6 +4,7 @@
 
 (require racket/contract
          racket/list
+         racket/function
 
          sxml
 
@@ -150,3 +151,14 @@
       (check-tag? "main" (zubat:parent el div))
       (check-tag? "nav" (zubat:parent el a))
       (check-false (zubat:parent el el)))))
+
+;; 父级元素
+(define/contract (zubat:ancestor root el)
+  (-> sxml:element? sxml:element? (listof sxml:element?))
+  (((sxml:ancestor (const #t)) root) el))
+
+(module+ test
+  (test-case "zubar-ancestor"
+    (let ([item (zubat:select-first (λ (el) (equal? "a" (zubat:tag el))) el)])
+      (check-length 2 (zubat:ancestor el item))
+      (check-equal? '("nav" "main") (map zubat:tag (zubat:ancestor el item))))))
