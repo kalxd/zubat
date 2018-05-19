@@ -1,6 +1,12 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide zubat:attr
+         zubat:attr?
+         zubat:text
+         zubat:tag
+         zubat:id
+         zubat:class
+         zubat:class?)
 
 (require racket/file
          racket/contract

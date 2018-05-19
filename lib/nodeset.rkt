@@ -1,6 +1,13 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide zubat:children
+         zubat:child?
+         zubat:child
+         zubat:all
+         zubat:select
+         zubat:select-first
+         zubat:parent
+         zubat:ancestor)
 
 (require racket/contract
          racket/list
@@ -158,7 +165,7 @@
   (((sxml:ancestor (const #t)) root) el))
 
 (module+ test
-  (test-case "zubar-ancestor"
+  (test-case "zubar:ancestor"
     (let ([item (zubat:select-first (λ (el) (equal? "a" (zubat:tag el))) el)])
       (check-length 2 (zubat:ancestor el item))
       (check-equal? '("nav" "main") (map zubat:tag (zubat:ancestor el item))))))

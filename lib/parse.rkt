@@ -1,6 +1,7 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide file->sxml
+         inport->sxml)
 
 (require racket/list
          racket/file
