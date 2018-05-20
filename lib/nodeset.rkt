@@ -168,4 +168,20 @@
   (test-case "zubar:ancestor"
     (let ([item (zubat:select-first (λ (el) (equal? "a" (zubat:tag el))) el)])
       (check-length 2 (zubat:ancestor el item))
-      (check-equal? '("nav" "main") (map zubat:tag (zubat:ancestor el item))))))
+     (check-equal? '("nav" "main") (map zubat:tag (zubat:ancestor el item))))))
+
+;; 兄弟元素
+(define/contract (zubat:siblings root el)
+  (-> sxml:element? sxml:element? (listof sxml:element?))
+  (define parent (zubat:parent root el))
+  (filter (compose not
+                   (node-eq? el))
+          (zubat:children parent)))
+
+(module+ test
+  (test-case "zubar:siblings"
+    (let* ([nav (zubat:child el)]
+           [sib-ls (zubat:siblings el nav)]
+           [next-el (list-ref sib-ls 0)])
+      (check-length 1 sib-ls)
+      (check-tag? "div" next-el))))
