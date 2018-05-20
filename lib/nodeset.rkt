@@ -6,6 +6,7 @@
          zubat:all
          zubat:select
          zubat:select-first
+         zubat:select-id
          zubat:parent
          zubat:ancestor)
 
@@ -132,8 +133,7 @@
       (check-equal? "href1" (zubat:attr 'href nav-el))
       (check-equal? "item 1" (zubat:text nav-el)))))
 
-;; getElementById
-(define/contract (zubat:id id el)
+(define/contract (zubat:select-id id el)
   (-> string? sxml:element? (maybe/c sxml:element?))
   (define (select-id el)
     (equal? (zubat:attr 'id el)
@@ -141,10 +141,11 @@
   (zubat:select-first select-id el))
 
 (module+ test
-  (let ([body-el (zubat:id "body" el)]
-        [nil-el (zubat:id "you-do-not-know-me" el)])
-    (check-tag? "div" body-el)
-    (check-false nil-el)))
+  (test-case "zubat:select-id"
+    (let ([body-el (zubat:select-id "body" el)]
+          [nil-el (zubat:select-id "you-do-not-know-me" el)])
+      (check-tag? "div" body-el)
+      (check-false nil-el))))
 
 ;; 父一级元素
 (define/contract (zubat:parent root el)
@@ -153,7 +154,7 @@
 
 (module+ test
   (test-case "zubat:parent"
-    (let ([div (zubat:id "body" el)]
+    (let ([div (zubat:select-id "body" el)]
           [a (zubat:select-first (λ (el) (equal? "a" (zubat:tag el))) el)])
       (check-tag? "main" (zubat:parent el div))
       (check-tag? "nav" (zubat:parent el a))
