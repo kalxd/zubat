@@ -1,6 +1,8 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(provide (all-from-out "lib/parse.rkt")
+         (all-from-out "lib/node.rkt")
+         (all-from-out "lib/nodeset.rkt"))
 
 (require "lib/parse.rkt"
          "lib/node.rkt"
