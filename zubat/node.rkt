@@ -23,4 +23,6 @@
   (test-case "node-attr"
     (check-equal? "main-id" (node-attr el 'id))
     (check-equal? "button" (node-attr el1 'class))
-    (check-equal? #f (node-attr el 'class))))
+    (check-equal? #f (node-attr el 'class))
+    (check-equal? "text" (node-attr el2 'type))
+    (check-equal? #f (node-attr el2 'id))))
