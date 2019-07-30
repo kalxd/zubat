@@ -26,3 +26,16 @@
     (check-equal? #f (node-attr el 'class))
     (check-equal? "text" (node-attr el2 'type))
     (check-equal? #f (node-attr el2 'id))))
+
+;; 是否有这个属性。
+(define/contract (node-attr? el attr)
+  (-> sxml:element? symbol? boolean?)
+  (let ([value (node-attr el attr)])
+    (and value #t)))
+
+(module+ test
+  (test-case "node-attr?"
+    (check-true (node-attr? el 'id))
+    (check-false (node-attr? el 'class))
+    (check-true (node-attr? el1 'class))
+    (check-false (node-attr? el1 'id))))
