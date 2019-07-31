@@ -8,23 +8,24 @@
 
 @section{元素属性}
 
-@defproc[(zubat:attr [attr symbol?] [el sxml:element?]) (maybe/c string?)]{
-	查找元素某个属性。
+@defproc[(node-attr [el sxml:element?] [attr symbol?]) (or/c #f string?)]{
+	查找元素某个属性。由于是从网页上攫取下来的属性，它只能是@racket[string]类型，而且会自动@racket[string-trim]一遍。
 }
 
 @codeblock|{
 	(define el '(main (@ (id "main-id")) "main text"))
-	(zubat:attr 'id el) ;; -> "main-id"
+	(node-attr el 'id) ;; -> "main-id"
+	(node-attr el 'class) ;; #f
 }|
 
-@defproc[(zubat:attr? [att symbol?] [el sxml:element?]) boolean?]{
+@defproc[(node-attr? [el sxml:element?] [attr symbol?]) boolean?]{
 	元素是否存在某个属性。
 }
 
 @codeblock|{
 	(define el '(main (@ (id "main-id")) "main text"))
-	(zubat:attr? 'id el) ;; #t
-	(zubat:attr? 'class el) ;; #f
+	(node-attr? el 'id) ;; #t
+	(node-attr? el 'class) ;; #f
 }|
 
 @defproc[(zubat:text [el sxml:element?]) string?]{
