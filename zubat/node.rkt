@@ -50,3 +50,25 @@
     (check-equal? "main text" (node-text el))
     (check-equal? "primary button" (node-text el1))
     (check-equal? "" (node-text el2))))
+
+;; 无素标签名
+(define/contract node-tag-name
+  (-> sxml:element? string?)
+  (compose string-trim sxml:ncname))
+
+(module+ test
+  (test-case "node-tag-name")
+  (check-equal? "main" (node-tag-name el))
+  (check-equal? "div" (node-tag-name el1))
+  (check-equal? "input" (node-tag-name el2)))
+
+;; 元素的id
+(define/contract (node-id el)
+  (-> sxml:element? (or/c #f string?))
+  (node-attr el 'id))
+
+(module+ test
+  (test-case "node-id"
+    (check-equal? "main-id" (node-id el))
+    (check-false (node-id el1))
+    (check-false (node-id el2))))
