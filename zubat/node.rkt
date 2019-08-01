@@ -2,6 +2,7 @@
 
 (require racket/contract
          racket/string
+         racket/list
          sxml)
 
 (provide (all-defined-out))
@@ -72,3 +73,42 @@
     (check-equal? "main-id" (node-id el))
     (check-false (node-id el1))
     (check-false (node-id el2))))
+
+;; 是否有对应id
+(define/contract (node-id? el id)
+  (-> sxml:element? string? boolean?)
+  (let ([the-id (node-id el)])
+    (equal? the-id id)))
+
+(module+ test
+  (test-case "node-id"
+    (check-true (node-id? el "main-id"))
+    (check-false (node-id? el "mainid"))
+    (check-false (node-id? el1 "main-id"))
+    (check-false (node-id? el2 "main-id"))))
+
+;; 元素样式类
+(define/contract (node-class el)
+  (-> sxml:element? (listof string?))
+  (let ([the-class (node-attr el 'class)])
+    (if the-class (string-split the-class) empty)))
+
+(module+ test
+  (test-case "node-class"
+    (check-empty? (node-class el))
+    (check-equal? '("button") (node-class el1))
+    (check-equal? '("input") (node-class el2))))
+
+;; 是否包含该样式类
+(define/contract (node-class? el classname)
+  (-> sxml:element? string? boolean?)
+  (let* ([the-class (node-class el)]
+         [the-mem (member classname the-class)])
+    (and the-mem (not (null? the-mem)))))
+
+(module+ test
+  (test-case "node-class?"
+    (check-false (node-class? el "main"))
+    (check-false (node-class? el1 "div"))
+    (check-true (node-class? el1 "button"))
+    (check-true (node-class? el2 "input"))))

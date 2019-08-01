@@ -57,23 +57,34 @@
 	(node-id el) ;; #f
 }|
 
-@defproc[(zubat:class [el sxml:element?]) (listof string?)]{
+@defproc[(node-id? [el sxml:element?] [id string?]) boolean?]{
+	检查元素是否有相应的id。
+}
+@codeblock|{
+	(define el '(main (@ (id "main-id")) "main text"))
+	(node-id? el "main-id") ;; #t
+	(node-id? el "main") ;; #f
+}|
+
+@defproc[(node-class [el sxml:element?]) (listof string?)]{
 	获取元素class，以列表形式输出。
 }
 
 @codeblock|{
 	(define el '(div (@ (class "button")) "primary button"))
-	(zubat:class el) ;; '("button")
+	(node-class el) ;; '("button")
+	(define el '(main (@ (id "main-id")) "main text"))
+	(node-class el) ;; '()
 }|
 
-@defproc[(zubat:class? [name string?] [el sxml:element?]) boolean?]{
+@defproc[(node-class? [el sxml:element?] [name string?]) boolean?]{
 	元素是否包含某个class。
 }
 
 @codeblock|{
 	(define el '(div (@ (class "button")) "primary button"))
-	(zubat:class? "button" el) ;; #t
-	(zubat:class? "input" el) ;; #f
+	(node-class? el "button") ;; #t
+	(node-class? el "input") ;; #f
 }|
 
 @section{元素查找}
