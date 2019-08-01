@@ -28,13 +28,13 @@
 	(node-attr? el 'class) ;; #f
 }|
 
-@defproc[(zubat:text [el sxml:element?]) string?]{
+@defproc[(node-text [el sxml:element?]) string?]{
 	元素文本。
 }
 
 @codeblock|{
 	(define el '(main (@ (id "main-id")) "main text"))
-	(zubat:text el) ;; "main text"
+	(node-text el) ;; "main text"
 }|
 
 @defproc[(zubat:tag [el sxml:element?]) string?]{
@@ -45,7 +45,6 @@
 	(define el '(main (@ (id "main-id")) "main text"))
 	(zubat:tag el) ;; "main"
 }|
-
 
 @defproc[(zubat:id [el sxml:element?]) (maybe/c string?)]{
 	获取元素的id，id可能不存在，所以可能会返回@racket[#f]。

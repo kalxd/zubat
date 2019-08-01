@@ -39,3 +39,14 @@
     (check-false (node-attr? el 'class))
     (check-true (node-attr? el1 'class))
     (check-false (node-attr? el1 'id))))
+
+;; 元素文本
+(define/contract node-text
+  (-> sxml:element? string?)
+  (compose string-trim sxml:text))
+
+(module+ test
+  (test-case "node-text"
+    (check-equal? "main text" (node-text el))
+    (check-equal? "primary button" (node-text el1))
+    (check-equal? "" (node-text el2))))
