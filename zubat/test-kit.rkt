@@ -11,5 +11,5 @@
   (define-simple-check (check-empty? v)
     (empty? v))
 
-  (define-simple-check (check-length n xs)
+  (define-simple-check (check-length? n xs)
     (equal? n (length xs))))
