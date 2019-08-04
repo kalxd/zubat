@@ -18,3 +18,7 @@
 @defproc[(node-child [root (or/c empty? sxml:element?)]) (or/c #f sxml:element?)]{
 	获取第一个子元素。
 }
+
+@defproc[(node-all-children [root (or/c empty? sxml:elements?)]) nodeset?]{
+	获取所有子元素，与@racket[node-children]不同在于，它深度遍历得到每个元素的子元素，得到一条包含所有子元素的列表。
+}

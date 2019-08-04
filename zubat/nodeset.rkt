@@ -64,3 +64,22 @@
           [el1 '(div (p))])
       (check-false (node-child empty-el))
       (check-equal? "p" (node-tag-name (node-child el1))))))
+
+;; 深度遍历所有节点
+(define/contract (node-all-children el)
+  (-> (or/c empty? sxml:element?) nodeset?)
+  (foldl (λ (el xs)
+           (let ([the-children (node-all-children el)])
+             (append xs (cons el the-children))))
+         empty
+         (node-children el)))
+
+(module+ test
+  (test-case "node-all-children"
+    (check-length? 6 (node-all-children el))
+    (let ([el1 '(div (p) (p))]
+          [el2 '(div)]
+          [el3 '(div (div (div) (div)) (div))])
+      (check-length? 2 (node-all-children el1))
+      (check-length? 0 (node-all-children el2))
+      (check-length? 4 (node-all-children el3)))))
