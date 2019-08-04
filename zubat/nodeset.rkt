@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/contract
+         racket/list
          sxml
          "node.rkt")
 
@@ -23,7 +24,7 @@
 
 ;; 子元素列表
 (define/contract node-children
-  (-> sxml:element? nodeset?)
+  (-> (or/c empty? sxml:element?) nodeset?)
   (sxml:child sxml:element?))
 
 (module+ test
@@ -33,3 +34,33 @@
           [el2 '(div)])
       (check-length? 3 (node-children el1))
       (check-length? 0 (node-children el2)))))
+
+;; 是否有子元素
+(define/contract node-children?
+  (-> (or/c empty? sxml:element?) boolean?)
+  (compose not
+           empty?
+           node-children))
+
+(module+ test
+  (test-case "node-childre?"
+    (check-true (node-children? el))
+    (let ([el1 '(main)]
+          [el2 '(a (@ (href "link")))])
+      (check-false (node-children? el1))
+      (check-false (node-children? el2)))))
+
+(define/contract (node-child el)
+  (-> (or/c empty? sxml:element?) (or/c #f sxml:element?))
+  (let ([the-children (node-children el)])
+    (if (empty? the-children)
+        #f
+        (first the-children))))
+
+(module+ test
+  (test-case "node-child"
+    (check-equal? '("nav" "bar") (node-class (node-child el)))
+    (let ([empty-el '()]
+          [el1 '(div (p))])
+      (check-false (node-child empty-el))
+      (check-equal? "p" (node-tag-name (node-child el1))))))
