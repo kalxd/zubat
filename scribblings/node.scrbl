@@ -89,14 +89,6 @@
 
 @section{元素查找}
 
-@defproc[(zubat:all [root sxml:elements?]) nodeset?]{
-	获取所有子元素，与@racket[zubat:children]不同在于，它递归得到每个元素的子元素，之后得到一条包含所有子元素的列表。
-}
-
-@defproc[(zubat:select [f (-> sxml:element? boolean?)] [root sxml:element?]) (listof sxml:element?)]{
-	从所有子元素中过滤所需要的元素。
-}
-
 @defproc[(zubat:select-first [f (-> sxml:element? boolean?)] [root sxml:element?]) (maybe/c sxml:element?)]{
 	从所有子元素中过滤得到第一个元素。
 }

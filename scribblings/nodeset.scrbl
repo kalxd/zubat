@@ -22,3 +22,9 @@
 @defproc[(node-all-children [root (or/c empty? sxml:elements?)]) nodeset?]{
 	获取所有子元素，与@racket[node-children]不同在于，它深度遍历得到每个元素的子元素，得到一条包含所有子元素的列表。
 }
+
+@defproc[(node-select [root (or/c #f sxml:element?)] [f (-> sxml:element? boolean?)]) nodeset?]{
+	从所有子元素中过滤所需要的元素。
+
+	类似于@bold{querySelectorAll}，只是@racket[node-select]接受的是一个高阶函数，不是选择器。
+}

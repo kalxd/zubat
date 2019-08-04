@@ -83,3 +83,23 @@
       (check-length? 2 (node-all-children el1))
       (check-length? 0 (node-all-children el2))
       (check-length? 4 (node-all-children el3)))))
+
+;; 过滤所有元素
+(define/contract (node-select el f)
+  (-> (or/c empty? sxml:element?)
+      (-> sxml:element? boolean?)
+      nodeset?)
+  (filter f (node-all-children el)))
+
+(module+ test
+  (begin
+    (define (select-class2 el)
+      (= 2 (length (node-class el))))
+    (test-case "node-select"
+      (check-length? 2 (node-select el select-class2))
+      (check-length? 3 (node-select el
+                                    (λ (el)
+                                      (node-class? el "item"))))
+      (check-length? 1 (node-select el
+                                    (λ (el)
+                                      (equal? "p" (node-tag-name el))))))))
