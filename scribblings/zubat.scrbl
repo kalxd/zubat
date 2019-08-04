@@ -11,4 +11,5 @@
 
 在@racket[sxml]的基础上，实现了一些比较常用的功能，例如@bold{document.getElementById}。需要注意的是，zubat并没有@bold{document.querySelector}，因为我没有css selector解析库。
 
-@include-section["element.scrbl"]
+@include-section["node.scrbl"]
+@include-section["nodeset.scrbl"]

@@ -89,10 +89,6 @@
 
 @section{元素查找}
 
-@defproc[(zubat:children [root (or/c empty? sxml:element?)]) nodeset?]{
-	获取该元素下一级的所有子元素。
-}
-
 @defproc[(zubat:child? [root sxml:element?]) boolean?]{
 	该元素下是否有子元素。
 }
