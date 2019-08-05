@@ -6,6 +6,6 @@
                "rackunit-lib"))
 (define build-deps '("scribble-lib" "racket-doc"))
 (define scribblings '(("scribblings/zubat.scrbl" ())))
-(define pkg-desc "HTML 5文件解析")
-(define version "0.0.4")
+(define pkg-desc "HTML 5简易解释器。")
+(define version "0.1.0")
 (define pkg-authors '(XG.Ley))
