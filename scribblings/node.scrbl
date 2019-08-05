@@ -89,10 +89,6 @@
 
 @section{元素查找}
 
-@defproc[(zubat:select-first [f (-> sxml:element? boolean?)] [root sxml:element?]) (maybe/c sxml:element?)]{
-	从所有子元素中过滤得到第一个元素。
-}
-
 @defproc[(zubat:select-id [id string?] [root sxml:element?]) (maybe/c sxml:element?)]{
 	传说中的@bold{getElementById}。
 }

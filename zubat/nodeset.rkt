@@ -92,8 +92,8 @@
   (filter f (node-all-children el)))
 
 (module+ test
-  (let ([select-class2 (λ (el)
-                         (= 2 (length (node-class el))))])
+  (define (select-class2 el)
+    (= 2 (length (node-class el))))
     (test-case "node-select"
       (check-length? 2 (node-select el select-class2))
       (check-length? 3 (node-select el
@@ -101,4 +101,19 @@
                                       (node-class? el "item"))))
       (check-length? 1 (node-select el
                                     (λ (el)
-                                      (equal? "p" (node-tag-name el))))))))
+                                      (equal? "p" (node-tag-name el)))))))
+
+;; 只过滤出第一个元素
+(define/contract (node-select-first el f)
+  (-> (or/c empty? sxml:element?)
+      (-> sxml:element? boolean?)
+      (or/c #f sxml:element?))
+  (let ([the-el (node-select el f)])
+    (and (not (empty? the-el)) (first the-el))))
+
+(module+ test
+  (test-case "node-select-first"
+    (let ([nav-el (node-select-first el (λ (el) (equal? "a" (node-tag-name el))))])
+      (check-equal? "nav" (node-tag-name (node-select-first el select-class2)))
+      (check-equal? "href1" (node-attr nav-el 'href))
+      (check-equal? "item 1" (node-text nav-el)))))
