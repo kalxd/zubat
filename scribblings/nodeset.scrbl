@@ -32,3 +32,8 @@
 @defproc[(node-select-first [root (or/c empty? sxml:element?)] [f (-> sxml:element? boolean?)]) (or/c #f sxml:element?)]{
 	从所有子元素中过滤得到第一个元素。
 }
+
+@defproc[(node-select-id [root (or/c empty? sxml:element?)] [id string?]) (or/c #f sxml:element?)]{
+	传说中的@bold{getElementById}。
+}
+

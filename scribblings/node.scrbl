@@ -86,21 +86,3 @@
 	(node-class? el "button") ;; #t
 	(node-class? el "input") ;; #f
 }|
-
-@section{元素查找}
-
-@defproc[(zubat:select-id [id string?] [root sxml:element?]) (maybe/c sxml:element?)]{
-	传说中的@bold{getElementById}。
-}
-
-@defproc[(zubat:parent [root sxml:element?] [el sxml:element?]) (maybe/c sxml:element?)]{
-	元素的上一级元素。
-}
-
-@defproc[(zubat:ancestor [root sxml:element?] [el sxml:element?]) (listof sxml:element?)]{
-	元素的递归上级元素，即祖先链。
-}
-
-@defproc[(zubat:siblings [root sxml:element?] [el sxml:element?]) (listof sxml:element?)]{
-	同级元素。
-}

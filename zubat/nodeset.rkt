@@ -117,3 +117,17 @@
       (check-equal? "nav" (node-tag-name (node-select-first el select-class2)))
       (check-equal? "href1" (node-attr nav-el 'href))
       (check-equal? "item 1" (node-text nav-el)))))
+
+;; 根据id查找元素
+(define/contract (node-select-id el id)
+  (-> (or/c empty? sxml:element?) string? (or/c #f sxml:element?))
+  (let ([f (λ (n)
+             (equal? id (node-attr n 'id)))])
+    (node-select-first el f)))
+
+(module+ test
+  (test-case "node-select-id"
+    (let ([body-el (node-select-id el "body")]
+          [nil-el (node-select-id el "you-do-not-know-me")])
+      (check-tag? "div" body-el)
+      (check-false nil-el))))
