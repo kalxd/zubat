@@ -3,19 +3,12 @@ zubat
 
 HTML5解析库，在`sxml`基础之上封装一层，接口更加简单。
 
-已经失去使用racket动力，*不要使用这个库*。
+寻找有缘人，继续维护下去。
 
-使用
-----
+手册
+-----
 
-```racket
-(require zubat)
-
-(zubat:select-id "main" root) ;; 选择id为main的元素
-(zubat:children main) ;; main元素下所有子元素（不包含子元素之下的子元素——孙子一层元素）
-```
-
-该包下面的函数皆以`zubat:`开头。
+[zubat][https://docs.racket-lang.org/zubat/index.html]
 
 使用协议
 --------
