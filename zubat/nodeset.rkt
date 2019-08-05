@@ -92,9 +92,8 @@
   (filter f (node-all-children el)))
 
 (module+ test
-  (begin
-    (define (select-class2 el)
-      (= 2 (length (node-class el))))
+  (let ([select-class2 (λ (el)
+                         (= 2 (length (node-class el))))])
     (test-case "node-select"
       (check-length? 2 (node-select el select-class2))
       (check-length? 3 (node-select el
