@@ -8,7 +8,7 @@ HTML5解析库，在`sxml`基础之上封装一层，接口更加简单。
 手册
 -----
 
-[zubat][https://docs.racket-lang.org/zubat/index.html]
+[zubat](https://docs.racket-lang.org/zubat/index.html)
 
 使用协议
 --------
