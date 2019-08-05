@@ -1,24 +1,15 @@
 #lang scribble/manual
 
-@require[@for-label[zubat]]
+@require[@for-label[racket zubat sxml]]
 
 @title{解析它！}
 
 zubat解析利用html-parsing这个库进行解析。
 
-@section{inport->html}
+@defproc[(input-port->sxml [port input-port?]) sxml:element?]{
+	读取@racket[input-port]，转化成sxml。
+}
 
-将一个@racket[input-port]转换成@racket[sxml]。
-
-@racketblock[
-	(inport->sxml (open-input-string "<div>text</div>"))
-	'(*TOP* (div "text"))
-]
-
-@section{file->sxml}
-
-将本地文件直接解析成@racket[sxml]。
-
-@racketblock[
-	(file->sxml "sample.html")
-]
+@defproc[(file->sxml [file-path path-string?]) sxml:element?]{
+	读取文件，转化成sxml。
+}

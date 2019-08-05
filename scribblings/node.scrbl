@@ -2,11 +2,7 @@
 
 @require[@for-label[zubat sxml racket]]
 
-@title{元素解析}
-
-@racket[zubat]只提供解析功能，并没有修改、删除功能。
-
-@section{元素属性}
+@title{元素属性}
 
 @defproc[(node-attr [el sxml:element?] [attr symbol?]) (or/c #f string?)]{
 	查找元素某个属性。由于是从网页上攫取下来的属性，它只能是@racket[string]类型，而且会自动@racket[string-trim]一遍。
