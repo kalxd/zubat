@@ -11,3 +11,4 @@
 @include-section["parse.scrbl"]
 @include-section["node.scrbl"]
 @include-section["nodeset.scrbl"]
+@include-section["curry.scrbl"]

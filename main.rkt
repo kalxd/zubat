@@ -1,15 +1,15 @@
 #lang racket/base
 
-(provide (all-from-out "zubat/node.rkt")
-         (all-from-out "zubat/nodeset.rkt")
+(provide (all-from-out "./zubat/node.rkt")
+         (all-from-out "./zubat/nodeset.rkt")
          (all-defined-out))
 
 (require racket/contract
          racket/file
          html-parsing
          sxml
-         "zubat/node.rkt"
-         "zubat/nodeset.rkt")
+         "./zubat/node.rkt"
+         "./zubat/nodeset.rkt")
 
 (define/contract input-port->sxml
   (-> input-port? sxml:element?)
