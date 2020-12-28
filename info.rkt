@@ -2,10 +2,11 @@
 (define collection "zubat")
 (define deps '("base"
                "html-parsing"
-               "sxml"
-               "rackunit-lib"))
-(define build-deps '("scribble-lib" "racket-doc"))
+               "sxml"))
+(define build-deps '("scribble-lib"
+                     "racket-doc"
+                     "rackunit-lib"))
 (define scribblings '(("scribblings/zubat.scrbl" ())))
 (define pkg-desc "HTML 5简易解释器。")
-(define version "0.2.0")
+(define version "0.3.0")
 (define pkg-authors '(XG.Ley))
