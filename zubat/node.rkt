@@ -3,6 +3,7 @@
 (require racket/contract
          racket/string
          racket/list
+         net/url-string
          sxml
 
          (only-in "./util.rkt" define/curry))
@@ -14,7 +15,8 @@
   (displayln "测试开始！")
   (define el '(main (@ (id "main-id")) "main text"))
   (define el1 '(div (@ (class "button")) "primary button"))
-  (define el2 '(input (@ (class "input") (type "text")))))
+  (define el2 '(input (@ (class "input") (type "text"))))
+  (define el4 '(a (@ (href "link.html") (type "text")))))
 
 ;; 元素属性
 (define/curry (node-attr el attr)
@@ -114,3 +116,14 @@
     (check-false (node-class? el1 "div"))
     (check-true (node-class? el1 "button"))
     (check-true (node-class? el2 "input"))))
+
+;; 找出链接
+(define/curry (node-href el)
+  (-> sxml:element? (or/c #f url?))
+  (let ([href (node-attr el 'href)])
+    (and href (string->url href))))
+
+(module+ test
+  (test-case "node-href"
+    (check-false (node-href el))
+    (check-equal? "link.html" (url->string (node-href el4)))))
