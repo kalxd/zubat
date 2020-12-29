@@ -5,17 +5,13 @@
          (all-defined-out))
 
 (require racket/contract
-         racket/file
-         html-parsing
          sxml
+         html-parsing
+
          "./zubat/node.rkt"
          "./zubat/nodeset.rkt")
 
-(define/contract input-port->sxml
-  (-> input-port? sxml:element?)
-  html->xexp)
-
-(define/contract (file->sxml path)
-  (-> path-string? sxml:element?)
-  (let ([text (file->string path #:mode 'text)])
-    (html->xexp text)))
+;; 从一个输入口导出sxml。
+(define/contract (input->sxml input)
+  (-> (or/c input-port? string?) sxml:element?)
+  (html->xexp input))
