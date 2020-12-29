@@ -3,7 +3,8 @@
 (require racket/contract
          racket/list
          sxml
-         "node.rkt")
+         "node.rkt"
+         (only-in "./util.rkt" define/curry))
 
 (provide (all-defined-out))
 
@@ -23,7 +24,7 @@
                          (p "text")))))
 
 ;; 子元素列表
-(define/contract node-children
+(define/curry node-children
   (-> (or/c empty? sxml:element?) nodeset?)
   (sxml:child sxml:element?))
 
@@ -36,7 +37,7 @@
       (check-length? 0 (node-children el2)))))
 
 ;; 是否有子元素
-(define/contract node-children?
+(define/curry node-children?
   (-> (or/c empty? sxml:element?) boolean?)
   (compose not
            empty?
@@ -50,7 +51,7 @@
       (check-false (node-children? el1))
       (check-false (node-children? el2)))))
 
-(define/contract (node-child el)
+(define/curry (node-child el)
   (-> (or/c empty? sxml:element?) (or/c #f sxml:element?))
   (let ([the-children (node-children el)])
     (if (empty? the-children)
@@ -66,7 +67,7 @@
       (check-equal? "p" (node-tag-name (node-child el1))))))
 
 ;; 深度遍历所有节点
-(define/contract (node-all-children el)
+(define/curry (node-all-children el)
   (-> (or/c empty? sxml:element?) nodeset?)
   (foldl (λ (el xs)
            (let ([the-children (node-all-children el)])
@@ -85,7 +86,7 @@
       (check-length? 4 (node-all-children el3)))))
 
 ;; 过滤所有元素
-(define/contract (node-select el f)
+(define/curry (node-select el f)
   (-> (or/c empty? sxml:element?)
       (-> sxml:element? boolean?)
       nodeset?)
@@ -104,7 +105,7 @@
                                       (equal? "p" (node-tag-name el)))))))
 
 ;; 只过滤出第一个元素
-(define/contract (node-select-first el f)
+(define/curry (node-select-first el f)
   (-> (or/c empty? sxml:element?)
       (-> sxml:element? boolean?)
       (or/c #f sxml:element?))
@@ -119,7 +120,7 @@
       (check-equal? "item 1" (node-text nav-el)))))
 
 ;; 根据id查找元素
-(define/contract (node-select-id el id)
+(define/curry (node-select-by-id el id)
   (-> (or/c empty? sxml:element?) string? (or/c #f sxml:element?))
   (let ([f (λ (n)
              (equal? id (node-attr n 'id)))])
@@ -127,7 +128,35 @@
 
 (module+ test
   (test-case "node-select-id"
-    (let ([body-el (node-select-id el "body")]
-          [nil-el (node-select-id el "you-do-not-know-me")])
+    (let ([body-el (node-select-by-id el "body")]
+          [nil-el (node-select-by-id el "you-do-not-know-me")])
       (check-tag? "div" body-el)
       (check-false nil-el))))
+
+;; 根据class查找元素
+(define/curry (node-select-by-class el klass)
+  (-> (or/c empty? sxml:element?) string? nodeset?)
+  (define (f el)
+    (node-class? el klass))
+  (filter f (node-all-children el)))
+
+(module+ test
+  (test-case "node-select-by-class"
+    (check-empty? (node-select-by-class el "unkown"))
+    (check-length? 3 (node-select-by-class el "item"))))
+
+(define/curry (node-select-first-by-class el klass)
+  (-> sxml:element? string? (or/c #f sxml:element?))
+  (let ([children (node-select-by-class el klass)])
+    (if (empty? children)
+        #f
+        (car children))))
+
+(module+ test
+  (require net/url-string)
+
+  (test-case "node-select-first-by-class"
+    (check-false (node-select-first-by-class el "unkown"))
+    (check-equal? "href1"
+                  (url->string
+                   (node-href (node-select-first-by-class el "item"))))))
