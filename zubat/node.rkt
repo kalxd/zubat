@@ -3,7 +3,9 @@
 (require racket/contract
          racket/string
          racket/list
-         sxml)
+         sxml
+
+         (only-in "./util.rkt" define/curry))
 
 (provide (all-defined-out))
 
@@ -15,7 +17,7 @@
   (define el2 '(input (@ (class "input") (type "text")))))
 
 ;; 元素属性
-(define/contract (node-attr el attr)
+(define/curry (node-attr el attr)
   (-> sxml:element? symbol? (or/c #f string?))
   (let ([attr (sxml:attr el attr)])
     (and attr (string-trim attr))))
@@ -29,7 +31,7 @@
     (check-equal? #f (node-attr el2 'id))))
 
 ;; 是否有这个属性。
-(define/contract (node-attr? el attr)
+(define/curry (node-attr? el attr)
   (-> sxml:element? symbol? boolean?)
   (let ([value (node-attr el attr)])
     (and value #t)))
@@ -42,7 +44,7 @@
     (check-false (node-attr? el1 'id))))
 
 ;; 元素文本
-(define/contract node-text
+(define/curry node-text
   (-> sxml:element? string?)
   (compose string-trim sxml:text))
 
@@ -53,7 +55,7 @@
     (check-equal? "" (node-text el2))))
 
 ;; 无素标签名
-(define/contract node-tag-name
+(define/curry node-tag-name
   (-> sxml:element? string?)
   (compose string-trim sxml:ncname))
 
@@ -64,7 +66,7 @@
   (check-equal? "input" (node-tag-name el2)))
 
 ;; 元素的id
-(define/contract (node-id el)
+(define/curry (node-id el)
   (-> sxml:element? (or/c #f string?))
   (node-attr el 'id))
 
@@ -75,7 +77,7 @@
     (check-false (node-id el2))))
 
 ;; 是否有对应id
-(define/contract (node-id? el id)
+(define/curry (node-id? el id)
   (-> sxml:element? string? boolean?)
   (let ([the-id (node-id el)])
     (equal? the-id id)))
@@ -88,7 +90,7 @@
     (check-false (node-id? el2 "main-id"))))
 
 ;; 元素样式类
-(define/contract (node-class el)
+(define/curry (node-class el)
   (-> sxml:element? (listof string?))
   (let ([the-class (node-attr el 'class)])
     (if the-class (string-split the-class) empty)))
@@ -100,7 +102,7 @@
     (check-equal? '("input") (node-class el2))))
 
 ;; 是否包含该样式类
-(define/contract (node-class? el classname)
+(define/curry (node-class? el classname)
   (-> sxml:element? string? boolean?)
   (let* ([the-class (node-class el)]
          [the-mem (member classname the-class)])

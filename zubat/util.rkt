@@ -5,6 +5,8 @@
          (for-syntax racket/base
                      racket/syntax))
 
+(provide (all-defined-out))
+
 ;;; 结合racket/function、racket/contract，一口气同时两个函数。
 ;;; (define/curry (add x y) ..)
 ;;; 相当于定义了(define/contract (add x y) ...)及(define curry/add (curry add))
@@ -15,6 +17,12 @@
        #'(begin
            (define/contract (name args ...)
              body ...)
+           (define curry-name (curry name))))]
+
+    [(_ name body ...)
+     (with-syntax ([curry-name (format-id #'name "curry/~a" #'name)])
+       #'(begin
+           (define/contract name body ...)
            (define curry-name (curry name))))]))
 
 (module+ test
