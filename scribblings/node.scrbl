@@ -82,3 +82,7 @@
 	(node-class? el "button") ;; #t
 	(node-class? el "input") ;; #f
 }|
+
+@defproc[(node-href [el sxml:element?]) (or/c #f url?)]{
+找出元素的链接。
+}

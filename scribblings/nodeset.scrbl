@@ -33,7 +33,14 @@
 	从所有子元素中过滤得到第一个元素。
 }
 
-@defproc[(node-select-id [root (or/c empty? sxml:element?)] [id string?]) (or/c #f sxml:element?)]{
+@defproc[(node-select-by-id [root (or/c empty? sxml:element?)] [id string?]) (or/c #f sxml:element?)]{
 	传说中的@bold{getElementById}。
 }
 
+@defproc[(node-select-by-class [root sxml:element?] [class string?]) nodeset?]{
+找出包含class的所有元素。
+}
+
+@defproc[(node-select-first-by-class [root sxml:element?] [class string?]) (or/c #f sxml:element?)]{
+找出第一个包含该class的元素。
+}
