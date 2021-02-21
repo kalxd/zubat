@@ -2,6 +2,7 @@
 
 (provide (all-from-out "./zubat/node.rkt")
          (all-from-out "./zubat/nodeset.rkt")
+         (all-from-out sxml)
          (all-defined-out))
 
 (require racket/contract
