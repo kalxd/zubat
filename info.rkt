@@ -1,8 +1,7 @@
 #lang info
 (define collection "zubat")
 (define deps '("base"
-               "html-parsing"
-               "sxml"
+               "azelf"
                "rackunit-lib"))
 (define build-deps '("scribble-lib"
                      "racket-doc"))

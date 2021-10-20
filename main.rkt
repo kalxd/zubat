@@ -1,18 +1,8 @@
-#lang racket/base
+#lang azelf
 
-(provide (all-from-out "./zubat/node.rkt")
-         (all-from-out "./zubat/nodeset.rkt")
-         (all-from-out sxml)
-         (all-defined-out))
+(require xml html)
 
-(require racket/contract
-         sxml
-         html-parsing
+(define testing-file "./compiled/test.html")
 
-         "./zubat/node.rkt"
-         "./zubat/nodeset.rkt")
-
-;; 从一个输入口导出sxml。
-(define/contract (input->sxml input)
-  (-> (or/c input-port? string?) sxml:element?)
-  (html->xexp input))
+(define my-xml
+  (read-xhtml (open-input-file testing-file)))
