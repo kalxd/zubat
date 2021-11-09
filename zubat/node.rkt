@@ -1,12 +1,9 @@
-#lang racket/base
+#lang azelf
 
 (require racket/contract
          racket/string
          racket/list
-         net/url-string
-         sxml
-
-         (only-in "./util.rkt" define/curry))
+         sxml)
 
 (provide (all-defined-out))
 
@@ -19,34 +16,39 @@
   (define el4 '(a (@ (href "link.html") (type "text")))))
 
 ;; 元素属性
-(define/curry (node-attr el attr)
-  (-> sxml:element? symbol? (or/c #f string?))
-  (let ([attr (sxml:attr el attr)])
-    (and attr (string-trim attr))))
+(define/curry/contract (node-attr attr el)
+  (-> symbol? sxml:element? (Maybe/c string?))
+  (maybe/do
+   (attr <- (sxml:attr el attr))
+   (string-trim attr)))
 
 (module+ test
   (test-case "node-attr"
-    (check-equal? "main-id" (node-attr el 'id))
-    (check-equal? "button" (node-attr el1 'class))
-    (check-equal? #f (node-attr el 'class))
-    (check-equal? "text" (node-attr el2 'type))
-    (check-equal? #f (node-attr el2 'id))))
+    (define get-class (node-attr 'class))
+    (define get-id (node-attr 'id))
+
+    (check-equal? (Just "main-id") (get-id el))
+    (check-equal? (Just "button") (get-class el1))
+    (check-equal? nothing (get-class el))
+    (check-equal? (Just "text") (node-attr 'type el2))
+    (check-equal? nothing (get-id el2))))
 
 ;; 是否有这个属性。
-(define/curry (node-attr? el attr)
-  (-> sxml:element? symbol? boolean?)
-  (let ([value (node-attr el attr)])
-    (and value #t)))
+(define/curry/contract (node-attr? attr el)
+  (-> symbol? sxml:element? boolean?)
+  (match (node-attr attr el)
+    [(Just _) #t]
+    [_ #f]))
 
 (module+ test
   (test-case "node-attr?"
-    (check-true (node-attr? el 'id))
-    (check-false (node-attr? el 'class))
-    (check-true (node-attr? el1 'class))
-    (check-false (node-attr? el1 'id))))
+    (check-true (node-attr? 'id el))
+    (check-false (node-attr? 'class el))
+    (check-true (node-attr? 'class el1))
+    (check-false (node-attr? 'id el1))))
 
 ;; 元素文本
-(define/curry node-text
+(define/contract node-text
   (-> sxml:element? string?)
   (compose string-trim sxml:text))
 
@@ -57,7 +59,7 @@
     (check-equal? "" (node-text el2))))
 
 ;; 无素标签名
-(define/curry node-tag-name
+(define/contract node-tag-name
   (-> sxml:element? string?)
   (compose string-trim sxml:ncname))
 
@@ -92,10 +94,11 @@
     (check-false (node-id? el2 "main-id"))))
 
 ;; 元素样式类
-(define/curry (node-class el)
+(define/contract (node-class el)
   (-> sxml:element? (listof string?))
-  (let ([the-class (node-attr el 'class)])
-    (if the-class (string-split the-class) empty)))
+  (match (node-attr el 'class)
+    [(Just klass) (string-split klass)]
+    [_ empty]))
 
 (module+ test
   (test-case "node-class"
@@ -118,12 +121,11 @@
     (check-true (node-class? el2 "input"))))
 
 ;; 找出链接
-(define/curry (node-href el)
-  (-> sxml:element? (or/c #f url?))
-  (let ([href (node-attr el 'href)])
-    (and href (string->url href))))
+(define/contract node-href
+  (-> sxml:element? (Maybe/c string?))
+  (node-attr 'href))
 
 (module+ test
   (test-case "node-href"
-    (check-false (node-href el))
-    (check-equal? "link.html" (url->string (node-href el4)))))
+    (check-equal? nothing (node-href el))
+    (check-equal? (Just "link.html") (node-href el4))))
