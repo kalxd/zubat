@@ -12,7 +12,7 @@
   (displayln "测试开始！")
   (define el '(main (@ (id "main-id")) "main text"))
   (define el1 '(div (@ (class "button")) "primary button"))
-  (define el2 '(input (@ (class "input") (type "text"))))
+  (define el2 '(input (@ (class "input") (type "text") (value "input"))))
   (define el4 '(a (@ (href "link.html") (type "text")))))
 
 ;; 元素属性
@@ -70,33 +70,34 @@
   (check-equal? "input" (node-tag-name el2)))
 
 ;; 元素的id
-(define/curry (node-id el)
-  (-> sxml:element? (or/c #f string?))
-  (node-attr el 'id))
+(define/contract node-id
+  (-> sxml:element? (Maybe/c string?))
+  (node-attr 'id))
 
 (module+ test
   (test-case "node-id"
-    (check-equal? "main-id" (node-id el))
-    (check-false (node-id el1))
-    (check-false (node-id el2))))
+    (check-equal? (Just "main-id") (node-id el))
+    (check-equal? nothing (node-id el1))
+    (check-equal? nothing (node-id el2))))
 
 ;; 是否有对应id
-(define/curry (node-id? el id)
-  (-> sxml:element? string? boolean?)
-  (let ([the-id (node-id el)])
-    (equal? the-id id)))
+(define/curry (node-id? id el)
+  (-> string? sxml:element? boolean?)
+  (->> (node-id el)
+       (maybe-map (λ (id-) (equal? id id-)))
+       (maybe-> #f)))
 
 (module+ test
   (test-case "node-id"
-    (check-true (node-id? el "main-id"))
-    (check-false (node-id? el "mainid"))
-    (check-false (node-id? el1 "main-id"))
-    (check-false (node-id? el2 "main-id"))))
+    (check-true (node-id? "main-id" el))
+    (check-false (node-id? "mainid" el))
+    (check-false (node-id? "main-id" el1))
+    (check-false (node-id? "main-id" el2))))
 
 ;; 元素样式类
 (define/contract (node-class el)
   (-> sxml:element? (listof string?))
-  (match (node-attr el 'class)
+  (match (node-attr 'class el)
     [(Just klass) (string-split klass)]
     [_ empty]))
 
@@ -129,3 +130,12 @@
   (test-case "node-href"
     (check-equal? nothing (node-href el))
     (check-equal? (Just "link.html") (node-href el4))))
+
+;; 找出value。
+(define/contract node-value
+  (-> sxml:element? (Maybe/c string?))
+  (node-attr 'value))
+
+(module+ test
+  (test-case "node-value"
+    (check-equal? (Just "input") (node-value el2))))
