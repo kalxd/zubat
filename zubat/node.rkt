@@ -138,4 +138,5 @@
 
 (module+ test
   (test-case "node-value"
-    (check-equal? (Just "input") (node-value el2))))
+    (check-equal? (Just "input") (node-value el2))
+    (check-equal? nothing (node-value el))))
