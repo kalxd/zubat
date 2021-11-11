@@ -107,18 +107,18 @@
     (check-equal? '("input") (node-class el2))))
 
 ;; 是否包含该样式类
-(define/curry (node-class? el classname)
-  (-> sxml:element? string? boolean?)
+(define/curry (node-has-class? classname el)
+  (-> string? sxml:element? boolean?)
   (let* ([the-class (node-class el)]
          [the-mem (member classname the-class)])
     (and the-mem (not (null? the-mem)))))
 
 (module+ test
   (test-case "node-class?"
-    (check-false (node-class? el "main"))
-    (check-false (node-class? el1 "div"))
-    (check-true (node-class? el1 "button"))
-    (check-true (node-class? el2 "input"))))
+    (check-false (node-has-class? "main" el))
+    (check-false (node-has-class? "div" el1))
+    (check-true (node-has-class? "button" el1))
+    (check-true (node-has-class? "input" el2))))
 
 ;; 找出链接
 (define/contract node-href

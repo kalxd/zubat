@@ -1,18 +1,22 @@
-#lang racket/base
+#lang azelf
 
-(require racket/contract
-         racket/list
+(require racket/list
+         (only-in racket/function
+                  identity)
          sxml
-         "node.rkt"
-         (only-in "./util.rkt" define/curry))
+         "node.rkt")
 
 (provide (all-defined-out))
 
 (module+ test
-  (require "test-kit.rkt")
+  (require rackunit)
 
   (define-simple-check (check-tag? name el)
-    (equal? name (node-tag-name el)))
+    (equal? name (node-tag el)))
+
+  (define-simple-check (check-length? n xs)
+    (->> (length xs)
+         (= n it)))
 
   (define el '(main (@ (id "main"))
                     "hehe"
@@ -22,10 +26,12 @@
                          (a (@ (class "item") (href "href3")) "item 3"))
                     (div (@ (class "main body") (id "body"))
                          (p "text")))))
+(define node?
+  (or/c empty? sxml:element?))
 
 ;; 子元素列表
-(define/curry node-children
-  (-> (or/c empty? sxml:element?) nodeset?)
+(define/contract node-children
+  (-> node? nodeset?)
   (sxml:child sxml:element?))
 
 (module+ test
@@ -37,8 +43,8 @@
       (check-length? 0 (node-children el2)))))
 
 ;; 是否有子元素
-(define/curry node-children?
-  (-> (or/c empty? sxml:element?) boolean?)
+(define/contract node-children?
+  (-> node? boolean?)
   (compose not
            empty?
            node-children))
@@ -51,21 +57,24 @@
       (check-false (node-children? el1))
       (check-false (node-children? el2)))))
 
-(define/curry (node-child el)
-  (-> (or/c empty? sxml:element?) (or/c #f sxml:element?))
-  (let ([the-children (node-children el)])
-    (if (empty? the-children)
-        #f
-        (first the-children))))
+(define/contract node-first-child
+  (-> node? (Maybe/c sxml:element?))
+  (>-> node-children
+       (match-lambda
+         [(list a b ...) (Just a)]
+         [_ nothing])))
 
 (module+ test
-  (test-case "node-child"
-    (check-equal? '("nav" "bar") (node-class (node-child el)))
-    (let ([empty-el '()]
-          [el1 '(div (p))])
-      (check-false (node-child empty-el))
-      (check-equal? "p" (node-tag-name (node-child el1))))))
+  (test-case "node-first-child"
+    (check-equal? (Just (list "nav" "bar"))
+                  (->> (node-first-child el)
+                       (maybe-map node-class)))
 
+    (check-pred Nothing? (node-first-child empty))
+    (check-equal? (Just "p")
+                  (->> (node-first-child '(div (p) (a)))
+                       (maybe-map node-tag)))))
+#|
 ;; 深度遍历所有节点
 (define/curry (node-all-children el)
   (-> (or/c empty? sxml:element?) nodeset?)
@@ -102,7 +111,7 @@
                                       (node-class? el "item"))))
       (check-length? 1 (node-select el
                                     (λ (el)
-                                      (equal? "p" (node-tag-name el)))))))
+                                      (equal? "p" (node-tag el)))))))
 
 ;; 只过滤出第一个元素
 (define/curry (node-select-first el f)
@@ -114,8 +123,8 @@
 
 (module+ test
   (test-case "node-select-first"
-    (let ([nav-el (node-select-first el (λ (el) (equal? "a" (node-tag-name el))))])
-      (check-equal? "nav" (node-tag-name (node-select-first el select-class2)))
+    (let ([nav-el (node-select-first el (λ (el) (equal? "a" (node-tag el))))])
+      (check-equal? "nav" (node-tag (node-select-first el select-class2)))
       (check-equal? "href1" (node-attr nav-el 'href))
       (check-equal? "item 1" (node-text nav-el)))))
 
@@ -142,7 +151,7 @@
 
 (module+ test
   (test-case "node-select-by-class"
-    (check-empty? (node-select-by-class el "unkown"))
+    (check-pred empty? (node-select-by-class el "unkown"))
     (check-length? 3 (node-select-by-class el "item"))))
 
 (define/curry (node-select-first-by-class el klass)
@@ -160,3 +169,4 @@
     (check-equal? "href1"
                   (url->string
                    (node-href (node-select-first-by-class el "item"))))))
+|#
