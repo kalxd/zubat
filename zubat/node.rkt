@@ -58,15 +58,15 @@
     (check-equal? "" (node-text el2))))
 
 ;; 无素标签名
-(define/contract node-tag-name
+(define/contract node-tag
   (-> sxml:element? string?)
   (compose string-trim sxml:ncname))
 
 (module+ test
-  (test-case "node-tag-name")
-  (check-equal? "main" (node-tag-name el))
-  (check-equal? "div" (node-tag-name el1))
-  (check-equal? "input" (node-tag-name el2)))
+  (test-case "node-tag")
+  (check-equal? "main" (node-tag el))
+  (check-equal? "div" (node-tag el1))
+  (check-equal? "input" (node-tag el2)))
 
 ;; 元素的id
 (define/contract node-id
