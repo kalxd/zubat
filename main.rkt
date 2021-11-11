@@ -1,8 +1,8 @@
 #lang azelf
 
-(require xml html)
+(require html-parsing)
 
 (define testing-file "./compiled/test.html")
 
-(define my-xml
-  (read-xhtml (open-input-file testing-file)))
+(define p (open-input-file testing-file))
+(define doc (html->xexp p))

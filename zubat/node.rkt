@@ -8,8 +8,7 @@
 (provide (all-defined-out))
 
 (module+ test
-  (require "test-kit.rkt")
-  (displayln "测试开始！")
+  (require rackunit)
   (define el '(main (@ (id "main-id")) "main text"))
   (define el1 '(div (@ (class "button")) "primary button"))
   (define el2 '(input (@ (class "input") (type "text") (value "input"))))
@@ -103,7 +102,7 @@
 
 (module+ test
   (test-case "node-class"
-    (check-empty? (node-class el))
+    (check-equal? empty (node-class el))
     (check-equal? '("button") (node-class el1))
     (check-equal? '("input") (node-class el2))))
 
