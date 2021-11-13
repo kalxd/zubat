@@ -114,7 +114,7 @@
     (and the-mem (not (null? the-mem)))))
 
 (module+ test
-  (test-case "node-class?"
+  (test-case "node-has-class?"
     (check-false (node-has-class? "main" el))
     (check-false (node-has-class? "div" el1))
     (check-true (node-has-class? "button" el1))

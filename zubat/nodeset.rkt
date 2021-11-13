@@ -89,26 +89,32 @@
       (check-length? 0 (node-all-children el2))
       (check-length? 4 (node-all-children el3)))))
 
-#|
+
 ;; 过滤所有元素
-(define/curry (node-select el f)
-  (-> (or/c empty? sxml:element?)
-      (-> sxml:element? boolean?)
+(define/curry/contract (node-select-by f el)
+  (-> (-> sxml:element? boolean?)
+      node?
       nodeset?)
-  (filter f (node-all-children el)))
+  (define (g node)
+    (and (sxml:element? node)
+         (let ([value (f node)])
+           (and value node))))
+  ((sxml:descendant g) el))
 
 (module+ test
   (define (select-class2 el)
     (= 2 (length (node-class el))))
     (test-case "node-select"
-      (check-length? 2 (node-select el select-class2))
-      (check-length? 3 (node-select el
-                                    (λ (el)
-                                      (node-class? el "item"))))
-      (check-length? 1 (node-select el
-                                    (λ (el)
-                                      (equal? "p" (node-tag el)))))))
+      (check-length? 2
+                     (node-select-by select-class2 el))
+      (check-length? 3
+                     (node-select-by (node-has-class? "item")
+                                     el))
+      (check-length? 1
+                     (node-select-by (ntype?? 'p)
+                                     el))))
 
+#|
 ;; 只过滤出第一个元素
 (define/curry (node-select-first el f)
   (-> (or/c empty? sxml:element?)
