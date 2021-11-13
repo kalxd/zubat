@@ -26,12 +26,10 @@
                          (a (@ (class "item") (href "href3")) "item 3"))
                     (div (@ (class "main body") (id "body"))
                          (p "text")))))
-(define node?
-  (or/c empty? sxml:element?))
 
 ;; 子元素列表
 (define/contract node-children
-  (-> node? nodeset?)
+  (-> sxml:element? nodeset?)
   sxml:child-elements)
 
 (module+ test
@@ -44,7 +42,7 @@
 
 ;; 是否有子元素
 (define/contract node-children?
-  (-> node? boolean?)
+  (-> sxml:element? boolean?)
   (compose not
            empty?
            node-children))
@@ -57,26 +55,25 @@
       (check-false (node-children? el1))
       (check-false (node-children? el2)))))
 
-(define/match/contract (node-first-child el)
-  (-> node? (Maybe/c sxml:element?))
-  [((list)) nothing]
-  [(_) (->> el
-            (select-first-kid sxml:element?)
-            ->maybe)])
+; 第一个子元素
+(define/contract (node-first-child el)
+  (-> sxml:element? (Maybe/c sxml:element?))
+  (->> el
+       (select-first-kid sxml:element?)
+       ->maybe))
 
 (module+ test
   (test-case "node-first-child"
     (check-equal? (Just (list "nav" "bar"))
                   (->> (node-first-child el)
                        (maybe-map node-class)))
-
-    (check-pred Nothing? (node-first-child empty))
+    (check-pred Nothing? (node-first-child '(div)))
     (check-equal? (Just "p")
                   (->> (node-first-child '(div (p) (a)))
                        (maybe-map node-tag)))))
 ;; 深度遍历所有节点
 (define/contract node-all-children
-  (-> node? nodeset?)
+  (-> sxml:element? nodeset?)
   (sxml:descendant sxml:element?))
 
 (module+ test
@@ -89,11 +86,10 @@
       (check-length? 0 (node-all-children el2))
       (check-length? 4 (node-all-children el3)))))
 
-
 ;; 过滤所有元素
-(define/curry/contract (node-select-by f el)
+(define/curry/contract (node-search-by f el)
   (-> (-> sxml:element? boolean?)
-      node?
+      sxml:element?
       nodeset?)
   (define (g node)
     (and (sxml:element? node)
@@ -106,19 +102,19 @@
     (= 2 (length (node-class el))))
     (test-case "node-select"
       (check-length? 2
-                     (node-select-by select-class2 el))
+                     (node-search-by select-class2 el))
       (check-length? 3
-                     (node-select-by (node-has-class? "item")
+                     (node-search-by (node-has-class? "item")
                                      el))
       (check-length? 1
-                     (node-select-by (ntype?? 'p)
+                     (node-search-by (ntype?? 'p)
                                      el))))
 
 #|
 ;; 只过滤出第一个元素
-(define/curry (node-select-first el f)
-  (-> (or/c empty? sxml:element?)
-      (-> sxml:element? boolean?)
+(define/curry/contract (node-search-first f el)
+  (-> (-> sxml:element? boolean?)
+      sxml:element?
       (or/c #f sxml:element?))
   (let ([the-el (node-select el f)])
     (and (not (empty? the-el)) (first the-el))))
@@ -130,8 +126,8 @@
       (check-equal? "href1" (node-attr nav-el 'href))
       (check-equal? "item 1" (node-text nav-el)))))
 
-;; 根据id查找元素
-(define/curry (node-select-by-id el id)
+; 根据id查找元素
+(define/curry (node-search-by-id el id)
   (-> (or/c empty? sxml:element?) string? (or/c #f sxml:element?))
   (let ([f (λ (n)
              (equal? id (node-attr n 'id)))])
@@ -139,26 +135,26 @@
 
 (module+ test
   (test-case "node-select-id"
-    (let ([body-el (node-select-by-id el "body")]
-          [nil-el (node-select-by-id el "you-do-not-know-me")])
+    (let ([body-el (node-search-by-id el "body")]
+          [nil-el (node-search-by-id el "you-do-not-know-me")])
       (check-tag? "div" body-el)
       (check-false nil-el))))
 
 ;; 根据class查找元素
-(define/curry (node-select-by-class el klass)
+(define/curry (node-search-by-class el klass)
   (-> (or/c empty? sxml:element?) string? nodeset?)
   (define (f el)
     (node-class? el klass))
   (filter f (node-all-children el)))
 
 (module+ test
-  (test-case "node-select-by-class"
-    (check-pred empty? (node-select-by-class el "unkown"))
-    (check-length? 3 (node-select-by-class el "item"))))
+  (test-case "node-search-by-class"
+    (check-pred empty? (node-search-by-class el "unkown"))
+    (check-length? 3 (node-search-by-class el "item"))))
 
 (define/curry (node-select-first-by-class el klass)
   (-> sxml:element? string? (or/c #f sxml:element?))
-  (let ([children (node-select-by-class el klass)])
+  (let ([children (node-search-by-class el klass)])
     (if (empty? children)
         #f
         (car children))))
