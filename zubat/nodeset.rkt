@@ -74,15 +74,10 @@
     (check-equal? (Just "p")
                   (->> (node-first-child '(div (p) (a)))
                        (maybe-map node-tag)))))
-#|
 ;; 深度遍历所有节点
-(define/curry (node-all-children el)
-  (-> (or/c empty? sxml:element?) nodeset?)
-  (foldl (λ (el xs)
-           (let ([the-children (node-all-children el)])
-             (append xs (cons el the-children))))
-         empty
-         (node-children el)))
+(define/contract node-all-children
+  (-> node? nodeset?)
+  (sxml:descendant sxml:element?))
 
 (module+ test
   (test-case "node-all-children"
@@ -94,6 +89,7 @@
       (check-length? 0 (node-all-children el2))
       (check-length? 4 (node-all-children el3)))))
 
+#|
 ;; 过滤所有元素
 (define/curry (node-select el f)
   (-> (or/c empty? sxml:element?)
