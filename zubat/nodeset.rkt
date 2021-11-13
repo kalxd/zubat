@@ -32,7 +32,7 @@
 ;; 子元素列表
 (define/contract node-children
   (-> node? nodeset?)
-  (sxml:child sxml:element?))
+  sxml:child-elements)
 
 (module+ test
   (test-case "node-children"
@@ -57,12 +57,12 @@
       (check-false (node-children? el1))
       (check-false (node-children? el2)))))
 
-(define/contract node-first-child
+(define/match/contract (node-first-child el)
   (-> node? (Maybe/c sxml:element?))
-  (>-> node-children
-       (match-lambda
-         [(list a b ...) (Just a)]
-         [_ nothing])))
+  [((list)) nothing]
+  [(_) (->> el
+            (select-first-kid sxml:element?)
+            ->maybe)])
 
 (module+ test
   (test-case "node-first-child"
