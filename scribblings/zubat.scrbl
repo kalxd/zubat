@@ -1,6 +1,5 @@
 #lang scribble/manual
-@require[@for-label[zubat
-		    racket/base]]
+@require[@for-label[zubat azelf]]
 
 @title{zubat}
 @author{XG.Ley}

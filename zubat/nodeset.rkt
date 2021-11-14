@@ -170,7 +170,7 @@
   (node-search-first-by (node-class? klass) el))
 
 (module+ test
-  (test-case "node-select-first-by-class"
+  (test-case "node-first-by-class"
     (check-equal? nothing
                   (node-first-by-class "unkown" el))
     (check-equal? (Just "href1")
