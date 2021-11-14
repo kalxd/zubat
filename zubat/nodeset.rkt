@@ -105,7 +105,7 @@
       (check-length? 2
                      (node-search-by select-class2 el))
       (check-length? 3
-                     (node-search-by (node-has-class? "item")
+                     (node-search-by (node-class? "item")
                                      el))
       (check-length? 1
                      (node-search-by (ntype?? 'p)
@@ -157,7 +157,7 @@
 (define/curry (node-search-by-class klass el)
   (-> string? sxml:element? nodeset?)
   (->> (node-all-children el)
-       (filter (node-has-class? klass) it)))
+       (filter (node-class? klass) it)))
 
 (module+ test
   (test-case "node-search-by-class"
