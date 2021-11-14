@@ -100,6 +100,7 @@
 (module+ test
   (define (select-class2 el)
     (= 2 (length (node-class el))))
+
     (test-case "node-select"
       (check-length? 2
                      (node-search-by select-class2 el))
@@ -110,22 +111,34 @@
                      (node-search-by (ntype?? 'p)
                                      el))))
 
-#|
+
 ;; 只过滤出第一个元素
-(define/curry/contract (node-search-first f el)
+(define/curry/contract (node-search-first-by f el)
   (-> (-> sxml:element? boolean?)
       sxml:element?
-      (or/c #f sxml:element?))
-  (let ([the-el (node-select el f)])
-    (and (not (empty? the-el)) (first the-el))))
+      (Maybe/c sxml:element?))
+  (->maybe
+   (for/or ([x (node-children el)])
+     (or (->> (node-search-first-by f x)
+              (maybe-> #f))
+         (and (f x) x)))))
 
 (module+ test
   (test-case "node-select-first"
-    (let ([nav-el (node-select-first el (λ (el) (equal? "a" (node-tag el))))])
-      (check-equal? "nav" (node-tag (node-select-first el select-class2)))
-      (check-equal? "href1" (node-attr nav-el 'href))
-      (check-equal? "item 1" (node-text nav-el)))))
+    (define nav-el
+      (node-search-first-by (ntype?? 'a) el))
 
+    (check-equal? (Just "nav")
+                  (->> (node-search-first-by select-class2 el)
+                       (maybe-map node-tag)))
+    (check-equal? (Just "href1")
+                  (->> nav-el
+                       (maybe-then (node-attr 'href))))
+    (check-equal? (Just "item 1")
+                  (->> nav-el
+                       (maybe-map node-text)))))
+
+#|
 ; 根据id查找元素
 (define/curry (node-search-by-id el id)
   (-> (or/c empty? sxml:element?) string? (or/c #f sxml:element?))
