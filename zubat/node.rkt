@@ -35,9 +35,7 @@
 ;; 是否有这个属性。
 (define/curry/contract (node-attr? attr el)
   (-> symbol? sxml:element? boolean?)
-  (match (node-attr attr el)
-    [(Just _) #t]
-    [_ #f]))
+  (Just? (node-attr attr el)))
 
 (module+ test
   (test-case "node-attr?"
