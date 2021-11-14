@@ -152,19 +152,19 @@
                   (maybe/do
                    (x <- (node-by-id "you-dont-know-me" el))
                    (node-tag x)))))
-#|
+
 ;; 根据class查找元素
-(define/curry (node-search-by-class el klass)
-  (-> (or/c empty? sxml:element?) string? nodeset?)
-  (define (f el)
-    (node-class? el klass))
-  (filter f (node-all-children el)))
+(define/curry (node-search-by-class klass el)
+  (-> string? sxml:element? nodeset?)
+  (->> (node-all-children el)
+       (filter (node-has-class? klass) it)))
 
 (module+ test
   (test-case "node-search-by-class"
-    (check-pred empty? (node-search-by-class el "unkown"))
-    (check-length? 3 (node-search-by-class el "item"))))
+    (check-pred empty? (node-search-by-class "unkown" el))
+    (check-length? 3 (node-search-by-class "item" el))))
 
+#|
 (define/curry (node-select-first-by-class el klass)
   (-> sxml:element? string? (or/c #f sxml:element?))
   (let ([children (node-search-by-class el klass)])
