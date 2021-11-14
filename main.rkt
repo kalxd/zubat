@@ -2,7 +2,10 @@
 
 (require html-parsing)
 
-(define testing-file "./compiled/test.html")
+(export-from "./zubat/node.rkt"
+             "./zubat/nodeset.rkt"
+             sxml)
 
-(define p (open-input-file testing-file))
-(define doc (html->xexp p))
+(provide html:parse)
+
+(define html:parse html->xexp)

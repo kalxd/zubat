@@ -155,25 +155,25 @@
                    (node-tag x)))))
 
 ;; 根据class查找元素
-(define/curry/contract (node-search-by-class klass el)
+(define/curry/contract (node-by-class klass el)
   (-> string? sxml:element? nodeset?)
   (->> (node-all-children el)
        (filter (node-class? klass) it)))
 
 (module+ test
-  (test-case "node-search-by-class"
-    (check-pred empty? (node-search-by-class "unkown" el))
-    (check-length? 3 (node-search-by-class "item" el))))
+  (test-case "node-by-class"
+    (check-pred empty? (node-by-class "unkown" el))
+    (check-length? 3 (node-by-class "item" el))))
 
-(define/curry/contract (node-search-first-by-class klass el)
+(define/curry/contract (node-first-by-class klass el)
   (-> string? sxml:element? (Maybe/c sxml:element?))
   (node-search-first-by (node-class? klass) el))
 
 (module+ test
   (test-case "node-select-first-by-class"
     (check-equal? nothing
-                  (node-search-first-by-class "unkown" el))
+                  (node-first-by-class "unkown" el))
     (check-equal? (Just "href1")
                   (maybe/do
-                   (x <- (node-search-first-by-class "item" el))
+                   (x <- (node-first-by-class "item" el))
                    (node-href x)))))
