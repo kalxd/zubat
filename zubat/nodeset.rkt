@@ -138,21 +138,21 @@
                   (->> nav-el
                        (maybe-map node-text)))))
 
-#|
 ; 根据id查找元素
-(define/curry (node-search-by-id el id)
-  (-> (or/c empty? sxml:element?) string? (or/c #f sxml:element?))
-  (let ([f (λ (n)
-             (equal? id (node-attr n 'id)))])
-    (node-select-first el f)))
+(define/curry/contract (node-by-id id el)
+  (-> string? sxml:element? (Maybe/c sxml:element?))
+  (node-search-first-by (node-id? id) el))
 
 (module+ test
   (test-case "node-select-id"
-    (let ([body-el (node-search-by-id el "body")]
-          [nil-el (node-search-by-id el "you-do-not-know-me")])
-      (check-tag? "div" body-el)
-      (check-false nil-el))))
-
+    (check-equal? (Just "div")
+                  (->> (node-by-id "body" el)
+                       (maybe-map node-tag)))
+    (check-equal? nothing
+                  (maybe/do
+                   (x <- (node-by-id "you-dont-know-me" el))
+                   (node-tag x)))))
+#|
 ;; 根据class查找元素
 (define/curry (node-search-by-class el klass)
   (-> (or/c empty? sxml:element?) string? nodeset?)
