@@ -1,6 +1,7 @@
 #lang azelf
 
-(require racket/list
+(require (only-in racket/list
+                  empty?)
          (only-in racket/function
                   identity)
          sxml
@@ -154,7 +155,7 @@
                    (node-tag x)))))
 
 ;; 根据class查找元素
-(define/curry (node-search-by-class klass el)
+(define/curry/contract (node-search-by-class klass el)
   (-> string? sxml:element? nodeset?)
   (->> (node-all-children el)
        (filter (node-class? klass) it)))
@@ -164,20 +165,15 @@
     (check-pred empty? (node-search-by-class "unkown" el))
     (check-length? 3 (node-search-by-class "item" el))))
 
-#|
-(define/curry (node-select-first-by-class el klass)
-  (-> sxml:element? string? (or/c #f sxml:element?))
-  (let ([children (node-search-by-class el klass)])
-    (if (empty? children)
-        #f
-        (car children))))
+(define/curry/contract (node-search-first-by-class klass el)
+  (-> string? sxml:element? (Maybe/c sxml:element?))
+  (node-search-first-by (node-class? klass) el))
 
 (module+ test
-  (require net/url-string)
-
   (test-case "node-select-first-by-class"
-    (check-false (node-select-first-by-class el "unkown"))
-    (check-equal? "href1"
-                  (url->string
-                   (node-href (node-select-first-by-class el "item"))))))
-|#
+    (check-equal? nothing
+                  (node-search-first-by-class "unkown" el))
+    (check-equal? (Just "href1")
+                  (maybe/do
+                   (x <- (node-search-first-by-class "item" el))
+                   (node-href x)))))
