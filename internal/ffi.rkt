@@ -5,6 +5,8 @@
          (for-syntax racket/base
                      racket/syntax))
 
+(provide (all-defined-out))
+
 (define-syntax (define-pointer stx)
   (syntax-case stx ()
     [(_ name)
@@ -24,18 +26,20 @@
 (define-pointer element)
 (define-pointer element-iter)
 (define-pointer element-text-iter)
+(define-pointer element-classes-iter)
+(define-pointer element-attrs-iter)
 
-(define-golbat element-name
-  (_fun element-ptr* -> _string)
-  #:c-id element_name)
+(define-cstruct _element-attr-tuple
+  ([fst _string]
+   [snd _string]))
 
 (define-golbat element-select
   (_fun element-ptr* selector-ptr* -> element-iter-ptr*)
   #:c-id element_select)
 
-(define-golbat element-id
-  (_fun element-ptr* -> _string)
-  #:c-id element_id)
+(define-golbat next-element-select
+  (_fun element-iter-ptr* -> element-ptr*)
+  #:c-id next_element_select)
 
 (define-golbat element-html
   (_fun element-ptr* -> _string)
@@ -48,6 +52,34 @@
 (define-golbat element-text
   (_fun element-ptr* -> element-text-iter-ptr*)
   #:c-id element_text)
+
+(define-golbat element-name
+  (_fun element-ptr* -> _string)
+  #:c-id element_name)
+
+(define-golbat element-id
+  (_fun element-ptr* -> _string)
+  #:c-id element_id)
+
+(define-golbat element-classes
+  (_fun element-ptr* -> element-classes-iter-ptr*)
+  #:c-id element_classes)
+
+(define-golbat next-element-classes
+  (_fun element-classes-iter-ptr* -> _string)
+  #:c-id next_element_classes)
+
+(define-golbat element-attr
+  (_fun element-ptr* -> _string)
+  #:c-id element_attr)
+
+(define-golbat element-attrs
+  (_fun element-ptr* -> element-attrs-iter-ptr*)
+  #:c-id element_attrs)
+
+(define-golbat next-element-attrs
+  (_fun element-attrs-iter-ptr* -> _element-attr-tuple)
+  #:c-id next_element_attrs)
 
 ;; html parser
 (define-pointer html)
@@ -68,22 +100,3 @@
 (define-golbat next-html-select
   (_fun html-iter-ptr* -> (_or-null element-ptr*))
   #:c-id next_html_select)
-
-(module+ test
-  (define html-doc
-    "<!DOCTYPE html>
-    <meta charset=\"utf-8\">
-    <title>Hello, world!</title>
-    <h1 class=\"foo\">Hello, <i>world!</i></h1>
-<input placeholder=\"this is placeholder\">")
-
-  (define fragment-doc
-    "<h1>Hello, <i>world!</i></h1>")
-
-  (define doc (parse-html html-doc))
-  (define selector (build-selector "input"))
-  (define iter (html-select doc selector))
-
-  (define el (next-html-select iter))
-  (displayln (element-name el))
-  (displayln (next-html-select iter)))
