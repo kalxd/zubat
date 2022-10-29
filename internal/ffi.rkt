@@ -38,7 +38,7 @@
   #:c-id element_select)
 
 (define-golbat next-element-select
-  (_fun element-iter-ptr* -> element-ptr*)
+  (_fun element-iter-ptr* -> (_or-null element-ptr*))
   #:c-id next_element_select)
 
 (define-golbat element-html
@@ -52,6 +52,10 @@
 (define-golbat element-text
   (_fun element-ptr* -> element-text-iter-ptr*)
   #:c-id element_text)
+
+(define-golbat next-element-text
+  (_fun element-text-iter-ptr* -> _string)
+  #:c-id next_element_text)
 
 (define-golbat element-name
   (_fun element-ptr* -> _string)
@@ -78,7 +82,7 @@
   #:c-id element_attrs)
 
 (define-golbat next-element-attrs
-  (_fun element-attrs-iter-ptr* -> _element-attr-tuple)
+  (_fun element-attrs-iter-ptr* -> _element-attr-tuple-pointer/null)
   #:c-id next_element_attrs)
 
 ;; html parser
