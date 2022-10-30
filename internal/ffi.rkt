@@ -74,7 +74,7 @@
   #:c-id next_element_classes)
 
 (define-golbat element-attr
-  (_fun element-ptr* -> _string)
+  (_fun element-ptr* _string -> _string)
   #:c-id element_attr)
 
 (define-golbat element-attrs

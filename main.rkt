@@ -2,9 +2,10 @@
 
 (require (only-in racket/port
                   port->string)
-         (prefix-in ffi: "./internal/ffi.rkt"))
+         (prefix-in ffi: "./internal/ffi.rkt")
+         "./internal/util.rkt")
 
-(export-from "./internal/util.rkt")
+(provide (all-defined-out))
 
 (define/contract string->html
   (-> string? Html?)
@@ -52,6 +53,25 @@
   (->> (query-element query-path el)
        head))
 
+(define/match1/contract element-html
+  (-> Element? string?)
+  [(Element ptr) (ffi:element-html ptr)])
+
+(define/match1/contract element-inner-html
+  (-> Element? string?)
+  [(Element ptr) (ffi:element-inner-html ptr)])
+
+(define/match1/contract element-text
+  (-> Element? (listof string?))
+  [(Element ptr)
+   (->> (ffi:element-text ptr)
+        Element-Text-Iter
+        element-text-iter->string-list)])
+
+(define/contract element-text1
+  (-> Element? (Maybe/c string?))
+  (>-> element-text head))
+
 (define/match1/contract element-id
   (-> Element? (Maybe/c string?))
   [(Element ptr)
@@ -61,9 +81,22 @@
   (-> Element? string?)
   [(Element ptr) (ffi:element-name ptr)])
 
-(define/match1/contract element-html
-  (-> Element? string?)
-  [(Element ptr) (ffi:element-html ptr)])
+(define/match1/contract element-class
+  (-> Element? (listof string?))
+  [(Element ptr)
+   (->> (ffi:element-classes ptr)
+        Element-Class-Iter
+        element-class-iter->string-list)])
+
+(define/contract element-class1
+  (-> Element? (Maybe/c string?))
+  (>-> element-class head))
+
+(define/curry/contract (element-attr1 name el)
+  (-> string? Element? (Maybe/c string?))
+  (match-define (Element ptr) el)
+  (->> (ffi:element-attr ptr name)
+       ->maybe))
 
 (module+ test
   (require racket/file)
@@ -75,4 +108,5 @@
   (displayln (maybe/do
               (n <- (query-html1 "#page" html))
               (n <- (query-element1 "p.line862" n))
-              (element-html n))))
+              (! (displayln (element-html n)))
+              (element-attr1 "sb" n))))
