@@ -5,7 +5,9 @@
          (prefix-in ffi: "./internal/ffi.rkt")
          "./internal/util.rkt")
 
-(provide (all-defined-out))
+(provide (all-defined-out)
+         Html?
+         Element?)
 
 (define/contract string->html
   (-> string? Html?)
@@ -97,16 +99,3 @@
   (match-define (Element ptr) el)
   (->> (ffi:element-attr ptr name)
        ->maybe))
-
-(module+ test
-  (require racket/file)
-
-  (define html
-    (->> (file->string "./sample.html")
-         string->html))
-
-  (displayln (maybe/do
-              (n <- (query-html1 "#page" html))
-              (n <- (query-element1 "p.line862" n))
-              (! (displayln (element-html n)))
-              (element-attr1 "sb" n))))

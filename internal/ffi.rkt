@@ -14,7 +14,7 @@
          #'(define name (_cpointer 'name)))]))
 
 (define-ffi-definer define-golbat
-  (ffi-lib (expand-user-path "~/Workspace/XGLib/golbat/target/debug/libgolbat.so")))
+  (ffi-lib "libgolbat.so"))
 
 ;; css selector
 (define-pointer selector)
