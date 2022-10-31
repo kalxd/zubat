@@ -2,21 +2,21 @@
 
 @require[@for-label[azelf zubat]]
 
-@title{你好啊}
+@title{zubat}
 
 @defmodule[zubat]
 
-@table-of-contents[]
+@section[#:tag "intro"]{开场白}
 
-@section[#:tag "start"]{使用该库的前置需求}
+这一个胶水胶起来的html5解析库，自身没有解析能力，需要依靠（FFI）rust。
 
-整体抛弃了@url{https://docs.racket-lang.org/html-parsing/index.html}，作为html5解析库，使用css selector明显更加合理。
+整体抛弃了@hyperlink{https://docs.racket-lang.org/html-parsing/index.html @literal{html-parsing}}，作为html5解析库，使用css selector明显更加合理。
 
-换句话说，这个库从底层的html-parsing换到了@url{https://github.com/kalxd/golbat}。使用前需要编译这个rust项目，将生成的动态库libgolbat.so复到到racket的库目录中。
+换句话说，这个库从底层的@hyperlink{https://docs.racket-lang.org/html-parsing/index.html @literal{html-parsing}}换到了@hyperlink{https://github.com/kalxd/golbat @literal{golbat}}。使用前需要编译这个rust项目，将生成的动态库libgolbat.so复到到racket的库目录中。
 
 可以使用@racket[current-library-collection-links]找到动态库路径。
 
-@section[#:tag "html-parser"]{HTML文档解板}
+@section[#:tag "html-parser"]{HTML文档解析}
 
 @defproc*[([(string->html [content string?]) Html?]
 		   [(input-port->html [port input-port?]) Html?])]{
