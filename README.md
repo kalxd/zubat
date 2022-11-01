@@ -1,19 +1,17 @@
 zubat
 =====
 
-HTML5解析库，在`sxml`基础之上封装一层，接口更加简单。
+![zubat](https://media.52poke.com/wiki/archive/d/da/20140405224319%21041Zubat.png)
 
-该项目构建在[azelf](https://github.com/kalxd/azelf)之上，风格偏向函数式，所有函数都是柯里化函数，并取消racket的空值，提供Maybe类型。
+这是一款实实在的html5解析库，仅作解析，不作html的修改、删除操作。
+是[golbat](https://github.com/kalxd/golbat)的racket包装实现。
 
-包裹详情
+
+详情
 -----
 
-[zubat](https://pkgs.racket-lang.org/package/zubat)
-
-手册
------
-
-[zubat在线手册](https://docs.racket-lang.org/zubat/index.html)
+* racket package： [zubat](https://pkgs.racket-lang.org/package/zubat)
+* 在线文档：[zubat文档](https://docs.racket-lang.org/zubat/index.html)
 
 使用协议
 --------
