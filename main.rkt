@@ -30,7 +30,7 @@
        string->fragment))
 
 (define/curry/contract (query-html query-path html)
-  (-> string? Html? (listof Element?))
+  (-> string? Html? (Array/c Element?))
   (match-define (Html html-ptr) html)
   (define selector-ptr (ffi:build-selector query-path))
   (define iter (->> (ffi:html-select html-ptr selector-ptr)
@@ -43,7 +43,7 @@
        head))
 
 (define/curry/contract (query-element query-path el)
-  (-> string? Element? (listof Element?))
+  (-> string? Element? (Array/c Element?))
   (match-define (Element element-ptr) el)
   (define selector-ptr (ffi:build-selector query-path))
   (define iter (->> (ffi:element-select element-ptr selector-ptr)
@@ -64,7 +64,7 @@
   [(Element ptr) (ffi:element-inner-html ptr)])
 
 (define/match1/contract element-text
-  (-> Element? (listof string?))
+  (-> Element? (Array/c string?))
   [(Element ptr)
    (->> (ffi:element-text ptr)
         Element-Text-Iter
@@ -84,7 +84,7 @@
   [(Element ptr) (ffi:element-name ptr)])
 
 (define/match1/contract element-class
-  (-> Element? (listof string?))
+  (-> Element? (Array/c string?))
   [(Element ptr)
    (->> (ffi:element-classes ptr)
         Element-Class-Iter
@@ -99,3 +99,10 @@
   (match-define (Element ptr) el)
   (->> (ffi:element-attr ptr name)
        ->maybe))
+
+(module+ test
+  (require racket/file)
+
+  (define doc
+    (->> (file->string "./sample.html")
+         string->html)))

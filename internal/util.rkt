@@ -1,8 +1,6 @@
 #lang azelf
 
-(require (prefix-in ffi: "./ffi.rkt")
-         (only-in racket/list
-                  empty))
+(require (prefix-in ffi: "./ffi.rkt"))
 
 (provide (all-defined-out))
 
@@ -35,53 +33,49 @@
         ->maybe)])
 
 (define/curry/contract (*html-iter->element-list xs iter)
-  (-> (listof Element?) Html-Iter? (listof Element?))
+  (-> (Array/c Element?) Html-Iter? (Array/c Element?))
   (match (try-next-select iter)
     [(Just el)
-     (->> (list el)
-          (concat xs it)
+     (->> (<:> el xs)
           (*html-iter->element-list it iter))]
     [_ xs]))
 
 (define/contract html-iter->element-list
-  (-> Html-Iter? (listof Element?))
+  (-> Html-Iter? (Array/c Element?))
   (*html-iter->element-list empty))
 
 (define/curry/contract (*element-iter->element-list xs iter)
-  (-> (listof Element?) Element-Iter? (listof Element?))
+  (-> (Array/c Element?) Element-Iter? (Array/c Element?))
   (match (try-next-select iter)
     [(Just el)
-     (->> (list el)
-          (concat xs it)
+     (->> (<:> el xs)
           (*element-iter->element-list it iter))]
     [_ xs]))
 
 (define/contract element-iter->element-list
-  (-> Element-Iter? (listof Element?))
+  (-> Element-Iter? (Array/c Element?))
   (*element-iter->element-list empty))
 
 (define/curry/contract (*element-text-iter->string-list xs iter)
-  (-> (listof string?) Element-Text-Iter? (listof string?))
+  (-> (Array/c string?) Element-Text-Iter? (Array/c string?))
   (match (try-next-string iter)
     [(Just t)
-     (->> (list t)
-          (concat xs it)
+     (->> (<:> t xs)
           (*element-text-iter->string-list it iter))]
     [_ xs]))
 
 (define/contract element-text-iter->string-list
-  (-> Element-Text-Iter? (listof string?))
+  (-> Element-Text-Iter? (Array/c string?))
   (*element-text-iter->string-list empty))
 
 (define/curry/contract (*element-class-iter->string-list xs iter)
-  (-> (listof string?) Element-Class-Iter? (listof string?))
+  (-> (Array/c string?) Element-Class-Iter? (Array/c string?))
   (match (try-next-string iter)
     [(Just s)
-     (->> (list s)
-          (concat xs it)
+     (->> (<:> s xs)
           (*element-class-iter->string-list it iter))]
     [_ xs]))
 
 (define/contract element-class-iter->string-list
-  (-> Element-Class-Iter? (listof string?))
+  (-> Element-Class-Iter? (Array/c string?))
   (*element-class-iter->string-list empty))

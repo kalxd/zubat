@@ -28,12 +28,12 @@
 效果与@racket[string->html]相同，不同在于它只能解析html片段，无法解析整张网页。
 }
 
-@defproc*[([(query-html [query-path string?] [html Html?]) (listof Element?)]
+@defproc*[([(query-html [query-path string?] [html Html?]) (Array/c Element?)]
 		   [(query-html1 [query-path string?] [html Html?]) (Maybe/c Element?)])]{
 利用css selector查询元素。
 }
 
-@defproc*[([(query-element [query-path string?] [el Element?]) (listof Element?)]
+@defproc*[([(query-element [query-path string?] [el Element?]) (Array/c Element?)]
 		   [(query-element1 [query-path string?] [el Element?]) (Maybe/c Element?)])]{
 同@racket[query-html]，仅查询主体不同。
 }
@@ -42,7 +42,7 @@
 		   [(element-inner-html [el Element?]) string?])]{
 }
 
-@defproc*[([(element-text [el Element?]) (listof string?)]
+@defproc*[([(element-text [el Element?]) (Array/c string?)]
 		   [(element-text1 [el Element?]) (Maybe/c string?)])]{
 元素的text，@racket[element-text]会显示所有子元素的text。
 }
@@ -55,7 +55,7 @@
 元素的tagname。
 }
 
-@defproc*[([(elemnet-class [el Element?]) (listof string?)]
+@defproc*[([(elemnet-class [el Element?]) (Array/c string?)]
 		   [(elemnet-class1 [el Element?]) (Maybe/c string?)])]{
 元素的class。
 }
