@@ -6,5 +6,5 @@
                      "racket-doc"))
 (define scribblings '(("scribblings/zubat.scrbl" ())))
 (define pkg-desc "走rust ffi的html5解释器")
-(define version "0.6.0")
+(define version "0.6")
 (define pkg-authors '(XG.Ley))
