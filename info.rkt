@@ -1,7 +1,6 @@
 #lang info
 (define collection "zubat")
-(define deps '("azelf #:version 0.4.0"
-               "rackunit-lib"))
+(define deps '("azelf" "rackunit-lib"))
 (define build-deps '("scribble-lib"
                      "racket-doc"))
 (define scribblings '(("scribblings/zubat.scrbl" ())))
