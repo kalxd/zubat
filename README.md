@@ -35,4 +35,4 @@ $ raco pkg install
 
 * AGPL v3
 
-golbat: https://github.com/kalxd/golbat
+[golbat]: https://github.com/kalxd/golbat
