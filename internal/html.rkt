@@ -17,8 +17,16 @@
   (>-> parse-fragment Html))
 
 (define/curry/contract (html-query selector doc)
-  (-> string? Html? Select?)
+  (-> string? Select? Html?)
   (define selector-ptr (build-selector selector))
   (->> (Html-ptr doc)
        (html-select it selector-ptr)
        Select))
+
+(define/curry/contract (html-query-id id doc)
+  (-> string? Html?)
+  (define selector-ptr
+    (->> (format "#~a" id)
+         build-selector))
+  (->> (Html-ptr doc)
+       (html-select it selector-ptr)))
