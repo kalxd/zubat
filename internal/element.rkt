@@ -1,3 +1,5 @@
 #lang azelf
 
-(struct Element [ptr])
+(provide (all-defined-out))
+
+(struct ElementRef [ptr])

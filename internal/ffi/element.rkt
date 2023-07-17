@@ -4,8 +4,8 @@
 
 (provide (all-defined-out))
 
-(define-ptr element)
+(define-ptr element_ref)
 
-(define-golbat free-element
-  (_fun _element_ptr -> _void)
+(define-golbat free-element-ref
+  (_fun _element_ref_ptr -> _void)
   #:wrap (deallocator))

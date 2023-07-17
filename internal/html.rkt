@@ -1,12 +1,14 @@
 #lang azelf
 
-(require "./ffi/html.rkt"
-         "./ffi/selector.rkt")
+(require (only-in ffi/unsafe ctype?)
+         "./ffi/html.rkt"
+         "./ffi/selector.rkt"
+         "./select.rkt"
+         "./element.rkt")
 
 (provide (all-defined-out))
 
 (struct Html [ptr])
-(struct Select [ptr])
 
 (define/contract string->html
   (-> string? Html?)
@@ -17,16 +19,8 @@
   (>-> parse-fragment Html))
 
 (define/curry/contract (html-query selector doc)
-  (-> string? Select? Html?)
+  (-> string? Html? (Array/c ElementRef?))
   (define selector-ptr (build-selector selector))
   (->> (Html-ptr doc)
        (html-select it selector-ptr)
-       Select))
-
-(define/curry/contract (html-query-id id doc)
-  (-> string? Html?)
-  (define selector-ptr
-    (->> (format "#~a" id)
-         build-selector))
-  (->> (Html-ptr doc)
-       (html-select it selector-ptr)))
+       html-select->array))

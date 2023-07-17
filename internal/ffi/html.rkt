@@ -7,7 +7,6 @@
 (provide (all-defined-out))
 
 (define-ptr html)
-(define-ptr select)
 
 (define-golbat free-html
   (_fun _html_ptr -> _void)
@@ -22,5 +21,5 @@
   #:wrap (allocator free-html))
 
 (define-golbat html-select
-  (_fun _html_ptr _selector_ptr -> _select_ptr)
+  (_fun _html_ptr _selector_ptr -> _html_select_ptr)
   #:wrap (allocator free-html-select))
