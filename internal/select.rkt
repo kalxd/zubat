@@ -8,7 +8,7 @@
 
 (define/curry/contract (try/html-select-next select-ptr)
   (-> cpointer? (Maybe/c ElementRef?))
-  (->> (html-element-next select-ptr)
+  (->> (html-select-next select-ptr)
        ->maybe
        (map ElementRef)))
 

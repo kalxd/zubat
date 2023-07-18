@@ -24,3 +24,10 @@
   (->> (Html-ptr doc)
        (html-select it selector-ptr)
        html-select->array))
+
+(define/curry/contract (html-query1 selector doc)
+  (-> string? Html? (Maybe/c ElementRef?))
+  (define selector-ptr (build-selector selector))
+  (->> (Html-ptr doc)
+       (html-select it selector-ptr)
+       try/html-select-next))

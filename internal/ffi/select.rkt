@@ -16,6 +16,10 @@
   (_fun _element_select_ptr -> _void)
   #:wrap (deallocator))
 
-(define-golbat html-element-next
+(define-golbat html-select-next
   (_fun _html_select_ptr -> (_or-null _element_ref_ptr))
+  #:wrap (allocator free-element-ref))
+
+(define-golbat element-select-next
+  (_fun _element_select_ptr -> (_or-null _element_ref_ptr))
   #:wrap (allocator free-element-ref))
