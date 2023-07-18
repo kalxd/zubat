@@ -7,22 +7,22 @@
 (provide (all-defined-out))
 
 (define/curry/contract (try/html-select-next select-ptr)
-  (-> cpointer? (Maybe/c ElementRef?))
+  (-> cpointer? (Maybe/c Element?))
   (->> (html-select-next select-ptr)
        ->maybe
-       (map ElementRef)))
+       (map Element)))
 
 (define/curry/contract (fold/html-select xs select-ptr)
-  (-> (Array/c ElementRef?)
+  (-> (Array/c Element?)
       cpointer?
-      (Array/c ElementRef?))
+      (Array/c Element?))
   (match (try/html-select-next select-ptr)
     [(Just el-ptr)
-     (->> (ElementRef el-ptr)
+     (->> (Element el-ptr)
           (<:> it xs)
           (fold/html-select it select-ptr))]
     [_ xs]))
 
 (define/contract html-select->array
-  (-> cpointer? (Array/c ElementRef?))
+  (-> cpointer? (Array/c Element?))
   (fold/html-select empty))
