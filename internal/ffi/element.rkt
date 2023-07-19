@@ -14,3 +14,6 @@
 (define-golbat element-id
   (_fun _element_ref_ptr -> (_or-null _cstring_ptr))
   #:wrap (allocator free-cstring))
+
+(define-golbat element-has-class
+  (_fun _element_ref_ptr _string -> _bool))

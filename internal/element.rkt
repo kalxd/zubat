@@ -13,3 +13,8 @@
        ffi:element-id
        ->maybe
        (map cstring->string)))
+
+(define/contract (element-class? klass el)
+  (-> string? Element? boolean?)
+  (->> (Element-ptr el)
+       (ffi:element-has-class it klass)))
