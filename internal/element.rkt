@@ -18,3 +18,10 @@
   (-> string? Element? boolean?)
   (->> (Element-ptr el)
        (ffi:element-has-class it klass)))
+
+(define/contract (element-attr name el)
+  (-> string? Element? (Maybe/c string?))
+  (->> (Element-ptr el)
+       (ffi:element-attr it name)
+       ->maybe
+       (map cstring->string)))

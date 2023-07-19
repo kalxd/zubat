@@ -12,10 +12,9 @@
   (require racket/file)
   (define x (file->string "./sample.html"))
   (define doc (string->html x))
-  (for ([_ (in-range 100000)])
-    (monad/do
-     (title <- (query-by-id "line-9" doc))
-     (! (displayln (element-class? "anchor" title)))
-     (id <- (element-id title))
-     (! (displayln id))
-     (Just 1))))
+  (monad/do
+   (title <- (query-by-id "line-9" doc))
+   (! (displayln (element-attr "id" title)))
+   (id <- (element-id title))
+   (! (displayln id))
+   (Just 1)))

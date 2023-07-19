@@ -17,3 +17,7 @@
 
 (define-golbat element-has-class
   (_fun _element_ref_ptr _string -> _bool))
+
+(define-golbat element-attr
+  (_fun _element_ref_ptr _string -> (_or-null _cstring_ptr))
+  #:wrap (allocator free-cstring))
