@@ -13,8 +13,8 @@
   (define x (file->string "./sample.html"))
   (define doc (string->html x))
   (monad/do
-   (title <- (query-by-id "line-9" doc))
-   (! (displayln (element-attr "id" title)))
+   (title <- (html-query1 ".line862 > a" doc))
+   (! (displayln (element-href title)))
    (id <- (element-id title))
    (! (displayln id))
    (Just 1)))
