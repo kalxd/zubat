@@ -8,6 +8,7 @@
 
 (define-ptr element_ref)
 (define-ptr attrs)
+(define-ptr classes)
 
 (define-golbat free-element-ref
   (_fun _element_ref_ptr -> _void)
@@ -43,3 +44,15 @@
 (define-golbat element-inner-html
   (_fun _element_ref_ptr -> _cstring_ptr)
   #:wrap (allocator free-cstring-pair))
+
+(define-golbat free-classes
+  (_fun _classes_ptr -> _void)
+  #:wrap (deallocator))
+
+(define-golbat element-classes
+  (_fun _element_ref_ptr -> _classes_ptr)
+  #:wrap (allocator free-classes))
+
+(define-golbat element-classes-next
+  (_fun _classes_ptr -> (_or-null _cstring_ptr))
+  #:wrap (allocator free-cstring))

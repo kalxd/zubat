@@ -69,3 +69,23 @@
     (->> (Element-ptr el)
          ffi:element-attrs))
   (fold/element-attrs map-empty attrs-ptr))
+
+(define/contract try/element-classes-next
+  (-> cpointer? (Maybe/c string?))
+  (>-> ffi:element-classes-next
+       ->maybe
+       (map cstring->string)))
+
+(define/curry/contract (fold/element-classes xs ptr)
+  (-> (Array/c string?) cpointer? (Array/c string?))
+  (match (try/element-classes-next ptr)
+    [(Just s)
+     (->> (<:> s xs)
+          (fold/element-classes it ptr))]
+    [_ xs]))
+
+(define/contract element-class
+  (-> Element? (Array/c string?))
+  (>-> Element-ptr
+       ffi:element-classes
+       (fold/element-classes empty)))
