@@ -3,7 +3,8 @@
 (require (only-in ffi/unsafe ctype? cpointer?)
          (prefix-in ffi: "./ffi/html.rkt")
          (prefix-in ffi: "./ffi/selector.rkt")
-         "./element.rkt")
+         "./element.rkt"
+         racket/port)
 
 (provide (all-defined-out))
 
@@ -16,6 +17,14 @@
 (define/contract string->fragment
   (-> string? Html?)
   (>-> ffi:parse-fragment Html))
+
+(define/contract input-port->html
+  (-> input-port? Html?)
+  (>-> port->string string->html))
+
+(define/contract input-port->fragment
+  (-> input-port? Element?)
+  (>-> port->string string->fragment))
 
 (define/contract (try/html-select-next select-ptr)
   (-> cpointer? (Maybe/c Element?))
