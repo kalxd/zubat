@@ -16,7 +16,9 @@
   (define doc (string->html x))
   (monad/do
    (title <- (html-query1 ".line862" doc))
-   (! (displayln (element-class title)))
+   (! (displayln (element-inner-html title))
+      (displayln (->> (element-query1 "span" title)
+                      (<$> (element-class? "anchor")))))
    (id <- (element-id title))
    (! (displayln id))
    (Just 1)))

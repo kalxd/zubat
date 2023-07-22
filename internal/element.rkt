@@ -2,6 +2,7 @@
 
 (require (prefix-in ffi: "./ffi/element.rkt")
          (prefix-in ffi: "./ffi/select.rkt")
+         (prefix-in ffi: "./ffi/selector.rkt")
          "./ffi/primitive.rkt"
          "./cstringpair.rkt"
          (only-in ffi/unsafe cpointer?))
@@ -91,7 +92,7 @@
        ffi:element-classes
        (fold/element-classes empty)))
 
-(define/contract (try/element-select-next ptr)
+(define/contract try/element-select-next
   (-> cpointer? (Maybe/c Element?))
   (>-> ffi:element-select-next
        ->maybe
@@ -108,3 +109,17 @@
 (define/contract element-select->array
   (-> cpointer? (Array/c Element?))
   (fold/element-select empty))
+
+(define/curry/contract (element-query selector el)
+  (-> string? Element? (Array/c Element?))
+  (define selector-ptr (ffi:build-selector selector))
+  (match-define (Element el-ptr) el)
+  (->> (ffi:element-select el-ptr selector-ptr)
+       element-select->array))
+
+(define/curry/contract (element-query1 selector el)
+  (-> string? Element? (Maybe/c Element?))
+  (define selector-ptr (ffi:build-selector selector))
+  (match-define (Element el-ptr) el)
+  (->> (ffi:element-select el-ptr selector-ptr)
+       try/element-select-next))
