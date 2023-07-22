@@ -37,9 +37,8 @@
       cpointer?
       (Array/c Element?))
   (match (try/html-select-next select-ptr)
-    [(Just el-ptr)
-     (->> (Element el-ptr)
-          (<:> it xs)
+    [(Just x)
+     (->> (<:> x xs)
           (fold/html-select it select-ptr))]
     [_ xs]))
 
