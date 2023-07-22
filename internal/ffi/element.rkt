@@ -2,6 +2,8 @@
 
 (require "./util.rkt"
          "./primitive.rkt"
+         "./selector.rkt"
+         "./select.rkt"
          "./cstringpair.rkt")
 
 (provide (all-defined-out))
@@ -56,3 +58,11 @@
 (define-golbat element-classes-next
   (_fun _classes_ptr -> (_or-null _cstring_ptr))
   #:wrap (allocator free-cstring))
+
+(define-golbat element-select
+  (_fun _selector_ptr -> _element_select_ptr)
+  #:wrap (allocator free-element-select))
+
+(define-golbat element-select-next
+  (_fun _element_select_ptr -> (_or-null _element_ref_ptr))
+  #:wrap (allocator free-element-ref))

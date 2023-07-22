@@ -2,7 +2,8 @@
 
 (require "./util.rkt"
          "./select.rkt"
-         "./selector.rkt")
+         "./selector.rkt"
+         "./element.rkt")
 
 (provide (all-defined-out))
 
@@ -23,3 +24,7 @@
 (define-golbat html-select
   (_fun _html_ptr _selector_ptr -> _html_select_ptr)
   #:wrap (allocator free-html-select))
+
+(define-golbat html-select-next
+  (_fun _html_select_ptr -> (_or-null _element_ref_ptr))
+  #:wrap (allocator free-element-ref))

@@ -1,6 +1,7 @@
 #lang azelf
 
 (require (prefix-in ffi: "./ffi/element.rkt")
+         (prefix-in ffi: "./ffi/select.rkt")
          "./ffi/primitive.rkt"
          "./cstringpair.rkt"
          (only-in ffi/unsafe cpointer?))
@@ -89,3 +90,21 @@
   (>-> Element-ptr
        ffi:element-classes
        (fold/element-classes empty)))
+
+(define/contract (try/element-select-next ptr)
+  (-> cpointer? (Maybe/c Element?))
+  (>-> ffi:element-select-next
+       ->maybe
+       (map Element)))
+
+(define/curry/contract (fold/element-select xs ptr)
+  (-> (Array/c Element?) cpointer? (Array/c Element?))
+  (match (try/element-select-next ptr)
+    [(Just x)
+     (->> (<:> x xs)
+          (fold/element-select it ptr))]
+    [_ xs]))
+
+(define/contract element-select->array
+  (-> cpointer? (Array/c Element?))
+  (fold/element-select empty))

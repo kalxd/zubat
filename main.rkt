@@ -1,7 +1,9 @@
 #lang azelf
 
-(require "./internal/html.rkt"
-         "./internal/element.rkt")
+(export-from "./internal/html.rkt"
+             "./internal/element.rkt")
+
+(provide (all-defined-out))
 
 (define/contract (query-by-id id doc)
   (-> string? Html? (Maybe/c Element?))
