@@ -10,15 +10,14 @@
   (define selector (format "#~a" id))
   (html-query1 selector doc))
 
-(module+ main
-  (require racket/file)
-  (define x (file->string "./sample.html"))
-  (define doc (string->html x))
-  (monad/do
-   (title <- (html-query1 ".line862" doc))
-   (! (displayln (element-inner-html title))
-      (displayln (->> (element-query1 "span" title)
-                      (<$> (element-class? "anchor")))))
-   (id <- (element-id title))
-   (! (displayln id))
-   (Just 1)))
+(define/curry/contract (query selector el)
+  (-> string? (or/c Html? Element?) (Array/c Element?))
+  (cond
+    [(Html? el) (html-query selector el)]
+    [else (element-query selector el)]))
+
+(define/curry/contract (query1 selector el)
+  (-> string? (or/c Html? Element?) (Maybe/c Element?))
+  (cond
+    [(Html? el) (html-query1 selector el)]
+    [else (element-query1 selector el)]))

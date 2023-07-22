@@ -123,3 +123,10 @@
   (match-define (Element el-ptr) el)
   (->> (ffi:element-select el-ptr selector-ptr)
        try/element-select-next))
+
+(define/contract (element-text el)
+  (-> Element? (Maybe/c string?))
+  (->> (Element-ptr el)
+       ffi:element-text
+       ->maybe
+       (map cstring->string)))

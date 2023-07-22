@@ -66,3 +66,7 @@
 (define-golbat element-select-next
   (_fun _element_select_ptr -> (_or-null _element_ref_ptr))
   #:wrap (allocator free-element-ref))
+
+(define-golbat element-text
+  (_fun _element_ref_ptr -> (_or-null _cstring_ptr))
+  #:wrap (allocator free-cstring))
