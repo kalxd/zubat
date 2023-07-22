@@ -20,5 +20,5 @@
          #'(define ptr (_cpointer 'name)))]))
 
 (define-ffi-definer define-golbat
-  (ffi-lib "libgolbatd.so")
+  (ffi-lib "libgolbat.so")
   #:make-c-id convention:hyphen->underscore)
