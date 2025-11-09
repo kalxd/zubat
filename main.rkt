@@ -1,5 +1,6 @@
 #lang azelf
 
+#|
 (export-from "./internal/html.rkt"
              "./internal/element.rkt")
 
@@ -21,3 +22,4 @@
   (cond
     [(Html? el) (html-query1 selector el)]
     [else (element-query1 selector el)]))
+|#

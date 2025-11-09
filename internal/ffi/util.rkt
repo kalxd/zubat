@@ -1,4 +1,4 @@
-#lang azelf
+#lang racket/base
 
 (require ffi/unsafe
          ffi/unsafe/define
