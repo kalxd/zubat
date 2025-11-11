@@ -1,5 +1,11 @@
 #lang azelf
 
+(require/typed ffi/unsafe
+  [#:opaque CType ctype?])
+
+(require/typed "./ffi/element.rkt"
+  [element-id (-> CType (Option String))])
+
 (require (prefix-in ffi: "./ffi/element.rkt")
          (prefix-in ffi: "./ffi/select.rkt")
          (prefix-in ffi: "./ffi/selector.rkt")
@@ -9,15 +15,15 @@
 
 (provide (all-defined-out))
 
-(struct Element [ptr])
+(struct Element ([ptr : CType]))
 
-(define/contract (element-id el)
-  (-> Element? (Maybe/c string?))
+(: out/element-id (-> Element (Option String)))
+(define (out/element-id el)
   (->> (Element-ptr el)
-       ffi:element-id
-       ->maybe
-       (map cstring->string)))
+       element-id
+       (option/map cstring->string)))
 
+#|
 (define/curry/contract (element-class? klass el)
   (-> string? Element? boolean?)
   (->> (Element-ptr el)
@@ -130,3 +136,4 @@
        ffi:element-text
        ->maybe
        (map cstring->string)))
+|#
