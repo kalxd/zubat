@@ -1,10 +1,11 @@
 #lang azelf
 
-(require/typed ffi/unsafe
-  [#:opaque CType cpointer?])
+(require "./type.rkt")
+
 (require/typed "./ffi/cstringpair.rkt"
   [cstring-pair-first (-> CType CType)]
   [cstring-pair-second (-> CType CType)])
+
 (require/typed "./ffi/primitive.rkt"
   [cstring->string (-> CType String)])
 

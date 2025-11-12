@@ -1,22 +1,30 @@
 #lang azelf
 
-(require/typed ffi/unsafe
-  [#:opaque CType ctype?])
+(require "./type.rkt")
+
 (require/typed "./ffi/element.rkt"
   [element-id (-> CType (Option CType))]
   [element-has-class (-> CType String Boolean)]
   [element-attr (-> CType String (Option CType))]
   [element-html (-> CType CType)]
-  [element-inner-html (-> CType CType)])
+  [element-inner-html (-> CType CType)]
+  [element-attrs-next (-> CType (Option CType))]
+  [element-attrs (-> CType CType)]
+  [element-classes (-> CType CType)]
+  [element-classes-next (-> CType (Option CType))])
+
 (require/typed "./ffi/primitive.rkt"
   [cstring->string (-> CType String)])
 
+(require "./cstringpair.rkt")
 
 (provide (rename-out [out/element-id element-id]
                      [out/element-class? element-class?]
                      [out/element-attr element-attr]
                      [out/element-html element-html]
-                     [out/element-inner-html element-inner-html])
+                     [out/element-inner-html element-inner-html]
+                     [out/element-attrs element-attrs]
+                     [out/element-classes element-classes])
          element-href
          element-value)
 
@@ -59,49 +67,41 @@
        element-inner-html
        cstring->string))
 
+(: fold/element-attrs
+   (-> CType
+       (Immutable-HashTable String String)
+       (Immutable-HashTable String String)))
+(define (fold/element-attrs ptr acc)
+  (define attr-ptr (element-attrs-next ptr))
+  (cond
+    [(eq? #f attr-ptr) acc]
+    [else (let ([key (cstring-pair-first attr-ptr)]
+                [value (cstring-pair-second attr-ptr)])
+            (hash-set acc key value))]))
+
+(: out/element-attrs (-> Element (Immutable-HashTable String String)))
+(define (out/element-attrs el)
+  (define attrs-ptr (->> (Element-ptr el)
+                         element-attrs))
+  (fold/element-attrs attrs-ptr (hash)))
+
+(: fold/element-classes
+   (-> CType
+       (Listof String)
+       (Listof String)))
+(define (fold/element-classes ptr acc)
+  (define klass (->> (element-classes-next ptr)
+                     (option/map it cstring->string)))
+  (cond
+    [(eq? #f klass) acc]
+    [else (let ([acc- (cons klass acc)])
+            (fold/element-classes ptr acc-))]))
+
+(: out/element-classes (-> Element (Listof String)))
+(define (out/element-classes el)
+  (->> (Element-ptr el)
+       (fold/element-classes it (list))))
 #|
-(define/contract (try/element-attrs-next ptr)
-  (-> cpointer? (Maybe/c cpointer?))
-  (->> (ffi:element-attrs-next ptr)
-       ->maybe))
-
-(define/curry/contract (fold/element-attrs acc ptr)
-  (-> (Map/c string? string?) cpointer? (Map/c string? string?))
-  (match (try/element-attrs-next ptr)
-    [(Just pair)
-     (->> (map-insert (cstring-pair-first pair)
-                      (cstring-pair-second pair)
-                      acc)
-          (fold/element-attrs it ptr))]
-    [_ acc]))
-
-(define/contract (element-attrs el)
-  (-> Element? (Map/c string? string?))
-  (define attrs-ptr
-    (->> (Element-ptr el)
-         ffi:element-attrs))
-  (fold/element-attrs map-empty attrs-ptr))
-
-(define/contract try/element-classes-next
-  (-> cpointer? (Maybe/c string?))
-  (>-> ffi:element-classes-next
-       ->maybe
-       (map cstring->string)))
-
-(define/curry/contract (fold/element-classes xs ptr)
-  (-> (Array/c string?) cpointer? (Array/c string?))
-  (match (try/element-classes-next ptr)
-    [(Just s)
-     (->> (<:> s xs)
-          (fold/element-classes it ptr))]
-    [_ xs]))
-
-(define/contract element-class
-  (-> Element? (Array/c string?))
-  (>-> Element-ptr
-       ffi:element-classes
-       (fold/element-classes empty)))
-
 (define/contract try/element-select-next
   (-> cpointer? (Maybe/c Element?))
   (>-> ffi:element-select-next
