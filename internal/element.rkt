@@ -100,6 +100,7 @@
 (: out/element-classes (-> Element (Listof String)))
 (define (out/element-classes el)
   (->> (Element-ptr el)
+       element-classes
        (fold/element-classes it (list))))
 #|
 (define/contract try/element-select-next
