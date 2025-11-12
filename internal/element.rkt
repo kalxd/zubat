@@ -4,20 +4,21 @@
   [#:opaque CType ctype?])
 (require/typed "./ffi/element.rkt"
   [element-id (-> CType (Option CType))]
-  [element-has-class (-> CType String Boolean)])
+  [element-has-class (-> CType String Boolean)]
+  [element-attr (-> CType String (Option CType))]
+  [element-html (-> CType CType)]
+  [element-inner-html (-> CType CType)])
 (require/typed "./ffi/primitive.rkt"
   [cstring->string (-> CType String)])
 
-#|
-(require (prefix-in ffi: "./ffi/element.rkt")
-         (prefix-in ffi: "./ffi/select.rkt")
-         (prefix-in ffi: "./ffi/selector.rkt")
-         "./cstringpair.rkt"
-(only-in ffi/unsafe cpointer?))
-|#
 
 (provide (rename-out [out/element-id element-id]
-                     [out/element-class? element-class?]))
+                     [out/element-class? element-class?]
+                     [out/element-attr element-attr]
+                     [out/element-html element-html]
+                     [out/element-inner-html element-inner-html])
+         element-href
+         element-value)
 
 (struct Element ([ptr : CType]))
 
@@ -31,34 +32,34 @@
 (define (out/element-class? el klass)
   (->> (Element-ptr el)
        (element-has-class it klass)))
-#|
-(define/curry/contract (element-attr name el)
-  (-> string? Element? (Maybe/c string?))
+
+(: out/element-attr (-> Element String (Option String)))
+(define (out/element-attr el name)
   (->> (Element-ptr el)
-       (ffi:element-attr it name)
-       ->maybe
-       (map cstring->string)))
+       (element-attr it name)
+       (option/map it cstring->string)))
 
-(define/contract element-href
-  (-> Element? (Maybe/c string?))
-  (element-attr "href"))
+(: element-href (-> Element (Option String)))
+(define (element-href el)
+  (out/element-attr el "href"))
 
-(define/contract element-value
-  (-> Element? (Maybe/c string?))
-  (element-attr "value"))
+(: element-value (-> Element (Option String)))
+(define (element-value el)
+  (out/element-attr el "value"))
 
-(define/contract element-html
-  (-> Element? string?)
-  (>-> Element-ptr
-       ffi:element-html
+(: out/element-html (-> Element String))
+(define (out/element-html el)
+  (->> (Element-ptr el)
+       element-html
        cstring->string))
 
-(define/contract element-inner-html
-  (-> Element? string?)
-  (>-> Element-ptr
-       ffi:element-inner-html
+(: out/element-inner-html (-> Element String))
+(define (out/element-inner-html el)
+  (->> (Element-ptr el)
+       element-inner-html
        cstring->string))
 
+#|
 (define/contract (try/element-attrs-next ptr)
   (-> cpointer? (Maybe/c cpointer?))
   (->> (ffi:element-attrs-next ptr)
