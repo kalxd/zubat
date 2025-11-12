@@ -2,18 +2,22 @@
 
 (require/typed ffi/unsafe
   [#:opaque CType ctype?])
-
 (require/typed "./ffi/element.rkt"
-  [element-id (-> CType (Option String))])
+  [element-id (-> CType (Option CType))]
+  [element-has-class (-> CType String Boolean)])
+(require/typed "./ffi/primitive.rkt"
+  [cstring->string (-> CType String)])
 
+#|
 (require (prefix-in ffi: "./ffi/element.rkt")
          (prefix-in ffi: "./ffi/select.rkt")
          (prefix-in ffi: "./ffi/selector.rkt")
-         "./ffi/primitive.rkt"
          "./cstringpair.rkt"
-         (only-in ffi/unsafe cpointer?))
+(only-in ffi/unsafe cpointer?))
+|#
 
-(provide (all-defined-out))
+(provide (rename-out [out/element-id element-id]
+                     [out/element-class? element-class?]))
 
 (struct Element ([ptr : CType]))
 
@@ -21,14 +25,13 @@
 (define (out/element-id el)
   (->> (Element-ptr el)
        element-id
-       (option/map cstring->string)))
+       (option/map it cstring->string)))
 
-#|
-(define/curry/contract (element-class? klass el)
-  (-> string? Element? boolean?)
+(: out/element-class? (-> Element String Boolean))
+(define (out/element-class? el klass)
   (->> (Element-ptr el)
-       (ffi:element-has-class it klass)))
-
+       (element-has-class it klass)))
+#|
 (define/curry/contract (element-attr name el)
   (-> string? Element? (Maybe/c string?))
   (->> (Element-ptr el)
