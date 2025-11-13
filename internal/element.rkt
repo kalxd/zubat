@@ -24,7 +24,8 @@
 
 (require "./cstringpair.rkt")
 
-(provide (rename-out [out/element-id element-id]
+(provide Element
+         (rename-out [out/element-id element-id]
                      [out/element-class? element-class?]
                      [out/element-attr element-attr]
                      [out/element-html element-html]

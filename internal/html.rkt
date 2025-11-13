@@ -1,61 +1,68 @@
 #lang azelf
 
-(require (only-in ffi/unsafe ctype? cpointer?)
-         (prefix-in ffi: "./ffi/html.rkt")
-         (prefix-in ffi: "./ffi/selector.rkt")
-         "./element.rkt"
+(require "./type.rkt"
+         (only-in "./element.rkt"
+                  Element)
          racket/port)
 
-(provide (all-defined-out))
+(require/typed "./ffi/html.rkt"
+  [parse-html (-> String CType)]
+  [parse-fragment (-> String CType)]
+  [html-select (-> CType CType CType)]
+  [html-select-next (-> CType (Option CType))])
 
-(struct Html [ptr])
+(require/typed "./ffi/selector.rkt"
+  [build-selector (-> String CType)])
 
-(define/contract string->html
-  (-> string? Html?)
-  (>-> ffi:parse-html Html))
+(provide Html
+         string->html
+         string->fragment
+         input-port->html
+         input-port->fragment
+         html-query
+         html-query1)
 
-(define/contract string->fragment
-  (-> string? Html?)
-  (>-> ffi:parse-fragment Html))
+(struct Html ([ptr : CType]))
 
-(define/contract input-port->html
-  (-> input-port? Html?)
-  (>-> port->string string->html))
+(: string->html (-> String Html))
+(define (string->html input)
+  (->> input parse-html Html))
 
-(define/contract input-port->fragment
-  (-> input-port? Element?)
-  (>-> port->string string->fragment))
+(: string->fragment (-> String Html))
+(define (string->fragment input)
+  (->> input parse-fragment Html))
 
-(define/contract (try/html-select-next select-ptr)
-  (-> cpointer? (Maybe/c Element?))
-  (->> (ffi:html-select-next select-ptr)
-       ->maybe
-       (map Element)))
+(: input-port->html (-> Input-Port Html))
+(define (input-port->html p)
+  (->> (port->string p)
+       string->html))
 
-(define/curry/contract (fold/html-select xs select-ptr)
-  (-> (Array/c Element?)
-      cpointer?
-      (Array/c Element?))
-  (match (try/html-select-next select-ptr)
-    [(Just x)
-     (->> (<:> x xs)
-          (fold/html-select it select-ptr))]
-    [_ xs]))
+(: input-port->fragment (-> Input-Port Html))
+(define (input-port->fragment p)
+  (->> (port->string p)
+       string->fragment))
 
-(define/contract html-select->array
-  (-> cpointer? (Array/c Element?))
-  (fold/html-select empty))
+(: fold/html-query
+   (-> CType (Listof Element) (Listof Element)))
+(define (fold/html-query select-ptr acc)
+  (define el-ptr (html-select-next select-ptr))
+  (cond
+    [(none? el-ptr) acc]
+    [else (->> (Element el-ptr)
+               (append acc (list it))
+               (fold/html-query select-ptr it))]))
 
-(define/curry/contract (html-query selector doc)
-  (-> string? Html? (Array/c Element?))
-  (define selector-ptr (ffi:build-selector selector))
+(: html-query (-> Html String (Listof Element)))
+(define (html-query doc selector)
+  (define selector-ptr (build-selector selector))
   (->> (Html-ptr doc)
-       (ffi:html-select it selector-ptr)
-       html-select->array))
+       (html-select it selector-ptr)
+       (fold/html-query it (list))))
 
-(define/curry/contract (html-query1 selector doc)
-  (-> string? Html? (Maybe/c Element?))
-  (define selector-ptr (ffi:build-selector selector))
+(: html-query1 (-> Html String (Option Element)))
+(define (html-query1 doc selector)
+  (define selector-ptr (build-selector selector))
   (->> (Html-ptr doc)
-       (ffi:html-select it selector-ptr)
-       try/html-select-next))
+       (html-select it selector-ptr)
+       html-select-next
+       (option/map it Element)))
