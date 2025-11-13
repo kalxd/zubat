@@ -29,4 +29,3 @@
   (cond
     [(Html? node) (html-query1 node selector)]
     [else (element-query1 node selector)]))
-
