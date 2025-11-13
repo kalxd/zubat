@@ -17,7 +17,6 @@
     [(Html? node) (html-query1 node selector)]
     [else (element-query1 node selector)]))
 
-
 (: query (-> VNode String (Listof Element)))
 (define (query node selector)
   (cond
