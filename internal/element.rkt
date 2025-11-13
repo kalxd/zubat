@@ -1,30 +1,31 @@
 #lang azelf
 
-(require "./type.rkt")
+(require typed/racket/unsafe)
 
-(require/typed "./ffi/element.rkt"
-  [element-id (-> CType (Option CType))]
-  [element-has-class (-> CType String Boolean)]
-  [element-attr (-> CType String (Option CType))]
-  [element-html (-> CType CType)]
-  [element-inner-html (-> CType CType)]
-  [element-attrs-next (-> CType (Option CType))]
-  [element-attrs (-> CType CType)]
-  [element-classes (-> CType CType)]
-  [element-classes-next (-> CType (Option CType))]
-  [element-select (-> CType CType CType)]
-  [element-select-next (-> CType (Option CType))]
-  [element-text (-> CType (Option CType))])
+(unsafe-require/typed "./ffi/element.rkt"
+  [element-id (-> Any (Option Any))]
+  [element-has-class (-> Any String Boolean)]
+  [element-attr (-> Any String (Option Any))]
+  [element-html (-> Any Any)]
+  [element-inner-html (-> Any Any)]
+  [element-attrs-next (-> Any (Option Any))]
+  [element-attrs (-> Any Any)]
+  [element-classes (-> Any Any)]
+  [element-classes-next (-> Any (Option Any))]
+  [element-select (-> Any Any Any)]
+  [element-select-next (-> Any (Option Any))]
+  [element-text (-> Any (Option Any))])
 
-(require/typed "./ffi/selector.rkt"
-  [build-selector (-> String CType)])
+(unsafe-require/typed "./ffi/selector.rkt"
+  [build-selector (-> String Any)])
 
-(require/typed "./ffi/primitive.rkt"
-  [cstring->string (-> CType String)])
+(unsafe-require/typed "./ffi/primitive.rkt"
+  [cstring->string (-> Any String)])
 
 (require "./cstringpair.rkt")
 
 (provide Element
+         Element?
          (rename-out [out/element-id element-id]
                      [out/element-class? element-class?]
                      [out/element-attr element-attr]
@@ -38,7 +39,7 @@
          element-href
          element-value)
 
-(struct Element ([ptr : CType]))
+(struct Element ([ptr : Any]))
 
 (: out/element-id (-> Element (Option String)))
 (define (out/element-id el)
@@ -78,7 +79,7 @@
        cstring->string))
 
 (: fold/element-attrs
-   (-> CType
+   (-> Any
        (Immutable-HashTable String String)
        (Immutable-HashTable String String)))
 (define (fold/element-attrs ptr acc)
@@ -96,7 +97,7 @@
   (fold/element-attrs attrs-ptr (hash)))
 
 (: fold/element-classes
-   (-> CType
+   (-> Any
        (Listof String)
        (Listof String)))
 (define (fold/element-classes ptr acc)
@@ -113,7 +114,7 @@
        element-classes
        (fold/element-classes it (list))))
 
-(: fold/element-select (-> CType (Listof Element) (Listof Element)))
+(: fold/element-select (-> Any (Listof Element) (Listof Element)))
 (define (fold/element-select select-ptr acc)
   (define el-ptr (element-select-next select-ptr))
   (cond

@@ -1,20 +1,21 @@
 #lang azelf
 
-(require "./type.rkt"
-         (only-in "./element.rkt"
+(require (only-in "./element.rkt"
                   Element)
-         racket/port)
+         racket/port
+         typed/racket/unsafe)
 
-(require/typed "./ffi/html.rkt"
-  [parse-html (-> String CType)]
-  [parse-fragment (-> String CType)]
-  [html-select (-> CType CType CType)]
-  [html-select-next (-> CType (Option CType))])
+(unsafe-require/typed "./ffi/html.rkt"
+  [parse-html (-> String Any)]
+  [parse-fragment (-> String Any)]
+  [html-select (-> Any Any Any)]
+  [html-select-next (-> Any (Option Any))])
 
-(require/typed "./ffi/selector.rkt"
-  [build-selector (-> String CType)])
+(unsafe-require/typed "./ffi/selector.rkt"
+  [build-selector (-> String Any)])
 
 (provide Html
+         Html?
          string->html
          string->fragment
          input-port->html
@@ -22,7 +23,7 @@
          html-query
          html-query1)
 
-(struct Html ([ptr : CType]))
+(struct Html ([ptr : Any]))
 
 (: string->html (-> String Html))
 (define (string->html input)
@@ -37,13 +38,18 @@
   (->> (port->string p)
        string->html))
 
+(module+ test
+  (define port (open-input-file "../sample.html"))
+  (define doc (input-port->html port))
+  (html-query doc "#main"))
+
 (: input-port->fragment (-> Input-Port Html))
 (define (input-port->fragment p)
   (->> (port->string p)
        string->fragment))
 
 (: fold/html-query
-   (-> CType (Listof Element) (Listof Element)))
+   (-> Any (Listof Element) (Listof Element)))
 (define (fold/html-query select-ptr acc)
   (define el-ptr (html-select-next select-ptr))
   (cond

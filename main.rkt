@@ -1,25 +1,32 @@
 #lang azelf
 
-#|
-(export-from "./internal/html.rkt"
-             "./internal/element.rkt")
+(require "./internal/html.rkt"
+         "./internal/element.rkt")
 
-(provide (all-defined-out))
+(provide (all-defined-out)
+         (all-from-out "./internal/html.rkt"
+                       "./internal/element.rkt"))
 
-(define/contract (query-by-id id doc)
-  (-> string? Html? (Maybe/c Element?))
+(define-type VNode
+  (U Html Element))
+
+(: query-by-id (-> VNode String (Option Element)))
+(define (query-by-id node id)
   (define selector (format "#~a" id))
-  (html-query1 selector doc))
-
-(define/curry/contract (query selector el)
-  (-> string? (or/c Html? Element?) (Array/c Element?))
   (cond
-    [(Html? el) (html-query selector el)]
-    [else (element-query selector el)]))
+    [(Html? node) (html-query1 node selector)]
+    [else (element-query1 node selector)]))
 
-(define/curry/contract (query1 selector el)
-  (-> string? (or/c Html? Element?) (Maybe/c Element?))
+
+(: query (-> VNode String (Listof Element)))
+(define (query node selector)
   (cond
-    [(Html? el) (html-query1 selector el)]
-    [else (element-query1 selector el)]))
-|#
+    [(Html? node) (html-query node selector)]
+    [else (element-query node selector)]))
+
+(: query1 (-> VNode String (Option Element)))
+(define (query1 node selector)
+  (cond
+    [(Html? node) (html-query1 node selector)]
+    [else (element-query1 node selector)]))
+
