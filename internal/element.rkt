@@ -13,7 +13,8 @@
   [element-classes (-> CType CType)]
   [element-classes-next (-> CType (Option CType))]
   [element-select (-> CType CType CType)]
-  [element-select-next (-> CType (Option CType))])
+  [element-select-next (-> CType (Option CType))]
+  [element-text (-> CType (Option CType))])
 
 (require/typed "./ffi/selector.rkt"
   [build-selector (-> String CType)])
@@ -31,7 +32,8 @@
                      [out/element-attrs element-attrs]
                      [out/element-classes element-classes]
                      [out/element-query element-query]
-                     [out/element-query1 element-query1])
+                     [out/element-query1 element-query1]
+                     [out/element-text element-text])
          element-href
          element-value)
 
@@ -137,11 +139,8 @@
          element-select-next))
   (option/map el-ptr Element))
 
-#|
-(define/contract (element-text el)
-  (-> Element? (Maybe/c string?))
+(: out/element-text (-> Element (Option String)))
+(define (out/element-text el)
   (->> (Element-ptr el)
-       ffi:element-text
-       ->maybe
-       (map cstring->string)))
-|#
+       element-text
+       (option/map it cstring->string)))
