@@ -11,7 +11,12 @@
   [element-attrs-next (-> CType (Option CType))]
   [element-attrs (-> CType CType)]
   [element-classes (-> CType CType)]
-  [element-classes-next (-> CType (Option CType))])
+  [element-classes-next (-> CType (Option CType))]
+  [element-select (-> CType CType CType)]
+  [element-select-next (-> CType (Option CType))])
+
+(require/typed "./ffi/selector.rkt"
+  [build-selector (-> String CType)])
 
 (require/typed "./ffi/primitive.rkt"
   [cstring->string (-> CType String)])
@@ -24,7 +29,8 @@
                      [out/element-html element-html]
                      [out/element-inner-html element-inner-html]
                      [out/element-attrs element-attrs]
-                     [out/element-classes element-classes])
+                     [out/element-classes element-classes]
+                     [out/element-query element-query])
          element-href
          element-value)
 
@@ -102,25 +108,25 @@
   (->> (Element-ptr el)
        element-classes
        (fold/element-classes it (list))))
+
+(: fold/element-select (-> CType (Listof Element) (Listof Element)))
+(define (fold/element-select select-ptr acc)
+  (define el-ptr (element-select-next select-ptr))
+  (cond
+    [(none? el-ptr) acc]
+    [else (->> (Element el-ptr)
+               (append acc (list it))
+               (fold/element-select select-ptr it))]))
+
+(: out/element-query (-> Element String (Listof Element)))
+(define (out/element-query el selector)
+  (define selector-ptr (build-selector selector))
+  (define select-ptr
+    (->> (Element-ptr el)
+         (element-select it selector-ptr)))
+  (fold/element-select select-ptr (list)))
+
 #|
-(define/contract try/element-select-next
-  (-> cpointer? (Maybe/c Element?))
-  (>-> ffi:element-select-next
-       ->maybe
-       (map Element)))
-
-(define/curry/contract (fold/element-select xs ptr)
-  (-> (Array/c Element?) cpointer? (Array/c Element?))
-  (match (try/element-select-next ptr)
-    [(Just x)
-     (->> (<:> x xs)
-          (fold/element-select it ptr))]
-    [_ xs]))
-
-(define/contract element-select->array
-  (-> cpointer? (Array/c Element?))
-  (fold/element-select empty))
-
 (define/curry/contract (element-query selector el)
   (-> string? Element? (Array/c Element?))
   (define selector-ptr (ffi:build-selector selector))
