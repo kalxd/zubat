@@ -30,7 +30,8 @@
                      [out/element-inner-html element-inner-html]
                      [out/element-attrs element-attrs]
                      [out/element-classes element-classes]
-                     [out/element-query element-query])
+                     [out/element-query element-query]
+                     [out/element-query1 element-query1])
          element-href
          element-value)
 
@@ -126,21 +127,17 @@
          (element-select it selector-ptr)))
   (fold/element-select select-ptr (list)))
 
+
+(: out/element-query1 (-> Element String (Option Element)))
+(define (out/element-query1 el selector)
+  (define selector-ptr (build-selector selector))
+  (define el-ptr
+    (->> (Element-ptr el)
+         (element-select it selector-ptr)
+         element-select-next))
+  (option/map el-ptr Element))
+
 #|
-(define/curry/contract (element-query selector el)
-  (-> string? Element? (Array/c Element?))
-  (define selector-ptr (ffi:build-selector selector))
-  (match-define (Element el-ptr) el)
-  (->> (ffi:element-select el-ptr selector-ptr)
-       element-select->array))
-
-(define/curry/contract (element-query1 selector el)
-  (-> string? Element? (Maybe/c Element?))
-  (define selector-ptr (ffi:build-selector selector))
-  (match-define (Element el-ptr) el)
-  (->> (ffi:element-select el-ptr selector-ptr)
-       try/element-select-next))
-
 (define/contract (element-text el)
   (-> Element? (Maybe/c string?))
   (->> (Element-ptr el)
