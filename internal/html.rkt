@@ -52,11 +52,10 @@
    (-> Any (Listof Element) (Listof Element)))
 (define (fold/html-query select-ptr acc)
   (define el-ptr (html-select-next select-ptr))
-  (cond
-    [(none? el-ptr) acc]
-    [else (->> (Element el-ptr)
-               (append acc (list it))
-               (fold/html-query select-ptr it))]))
+  (if el-ptr acc
+      (->> (Element el-ptr)
+           (append acc (list it))
+           (fold/html-query select-ptr it))))
 
 (: html-query (-> Html String (Listof Element)))
 (define (html-query doc selector)
