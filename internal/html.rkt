@@ -41,7 +41,8 @@
 (module+ test
   (define port (open-input-file "../sample.html"))
   (define doc (input-port->html port))
-  (html-query doc "#main"))
+  (html-query doc "#main")
+  (close-input-port port))
 
 (: input-port->fragment (-> Input-Port Html))
 (define (input-port->fragment p)
@@ -52,10 +53,11 @@
    (-> Any (Listof Element) (Listof Element)))
 (define (fold/html-query select-ptr acc)
   (define el-ptr (html-select-next select-ptr))
-  (if el-ptr acc
+  (if el-ptr
       (->> (Element el-ptr)
            (append acc (list it))
-           (fold/html-query select-ptr it))))
+           (fold/html-query select-ptr it))
+      acc))
 
 (: html-query (-> Html String (Listof Element)))
 (define (html-query doc selector)

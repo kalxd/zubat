@@ -118,10 +118,10 @@
 (define (fold/element-select select-ptr acc)
   (define el-ptr (element-select-next select-ptr))
   (if el-ptr
-      acc
       (->> (Element el-ptr)
            (append acc (list it))
-           (fold/element-select select-ptr it))))
+           (fold/element-select select-ptr it))
+      acc))
 
 (: out/element-query (-> Element String (Listof Element)))
 (define (out/element-query el selector)
